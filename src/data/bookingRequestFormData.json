@@ -1,0 +1,148 @@
+{
+  "LD-101": {
+    "guestName": "Dr. Anil Mehra",
+    "guestDesignation": "Visiting Professor",
+    "guestAddress": "22 Green Park Extension, New Delhi - 110016",
+    "guestMobileNumber": "+91 98100 11111",
+    "accompanyingPersons": [
+      { "name": "Sunita Mehra", "relationship": "Spouse" },
+      { "name": "Riya Mehra", "relationship": "Daughter" }
+    ],
+    "roomCount": "2",
+    "visitPurpose": "Conference coordination",
+    "stayDays": "4",
+    "applicantSignature": "Rahul Sharma",
+    "applicantNameAndEmployeeId": "Rahul Sharma | EMP-2041",
+    "applicantDesignationDepartment": "Assistant Registrar | Administration Department",
+    "mobileNumberLabel": "Mobile No",
+    "applicantMobileNumber": "+91 98765 43210",
+    "emailId": "rahul.sharma@example.com",
+    "paymentModes": [
+      { "label": "By Guest", "checked": true },
+      { "label": "By Applicant", "checked": false },
+      { "label": "University A/C", "checked": false },
+      { "label": "Special Fund/Project A/C", "checked": false }
+    ]
+  },
+  "LD-102": {
+    "guestName": "Ms. Kavita Rao",
+    "guestDesignation": "Audit Consultant",
+    "guestAddress": "14 Ashok Nagar, Lucknow - 226001",
+    "guestMobileNumber": "+91 98100 22222",
+    "accompanyingPersons": [
+      { "name": "Nitin Rao", "relationship": "Colleague" }
+    ],
+    "roomCount": "1",
+    "visitPurpose": "Audit review visit",
+    "stayDays": "3",
+    "applicantSignature": "Neha Singh",
+    "applicantNameAndEmployeeId": "Neha Singh | EMP-1874",
+    "applicantDesignationDepartment": "Accounts Officer | Finance Department",
+    "mobileNumberLabel": "Mobile No",
+    "applicantMobileNumber": "+91 98111 22446",
+    "emailId": "neha.singh@example.com",
+    "paymentModes": [
+      { "label": "By Guest", "checked": false },
+      { "label": "By Applicant", "checked": true },
+      { "label": "University A/C", "checked": false },
+      { "label": "Special Fund/Project A/C", "checked": false }
+    ]
+  },
+  "FG-201": {
+    "guestName": "Prof. Meenakshi Iyer",
+    "guestDesignation": "Workshop Expert",
+    "guestAddress": "8 Teachers Colony, Chennai - 600042",
+    "guestMobileNumber": "+91 98100 33333",
+    "accompanyingPersons": [
+      { "name": "Arjun Iyer", "relationship": "Assistant" }
+    ],
+    "roomCount": "1",
+    "visitPurpose": "Workshop facilitation",
+    "stayDays": "3",
+    "applicantSignature": "Swati Pandey",
+    "applicantNameAndEmployeeId": "Swati Pandey | EMP-3321",
+    "applicantDesignationDepartment": "Programme Coordinator | Academic Affairs",
+    "mobileNumberLabel": "Mobile No",
+    "applicantMobileNumber": "+91 98222 87331",
+    "emailId": "swati.pandey@example.com",
+    "paymentModes": [
+      { "label": "By Guest", "checked": false },
+      { "label": "By Applicant", "checked": false },
+      { "label": "University A/C", "checked": true },
+      { "label": "Special Fund/Project A/C", "checked": false }
+    ]
+  },
+  "FG-202": {
+    "guestName": "Mr. Vikram Sethi",
+    "guestDesignation": "Technical Consultant",
+    "guestAddress": "17 Sector 21, Chandigarh - 160022",
+    "guestMobileNumber": "+91 98100 44444",
+    "accompanyingPersons": [
+      { "name": "Pooja Sethi", "relationship": "Spouse" },
+      { "name": "Manoj Arora", "relationship": "Project Engineer" }
+    ],
+    "roomCount": "2",
+    "visitPurpose": "Infrastructure maintenance",
+    "stayDays": "4",
+    "applicantSignature": "Saurabh Singh",
+    "applicantNameAndEmployeeId": "Saurabh Singh | EMP-1198",
+    "applicantDesignationDepartment": "System Analyst | IT Services",
+    "mobileNumberLabel": "Mobile No",
+    "applicantMobileNumber": "+91 98333 64012",
+    "emailId": "saurabh.singh@example.com",
+    "paymentModes": [
+      { "label": "By Guest", "checked": false },
+      { "label": "By Applicant", "checked": false },
+      { "label": "University A/C", "checked": false },
+      { "label": "Special Fund/Project A/C", "checked": true }
+    ]
+  },
+  "SSB-301": {
+    "guestName": "Mr. Harish Batra",
+    "guestDesignation": "External Examiner",
+    "guestAddress": "5 Civil Lines, Jaipur - 302006",
+    "guestMobileNumber": "+91 98100 55555",
+    "accompanyingPersons": [
+      { "name": "Seema Batra", "relationship": "Spouse" }
+    ],
+    "roomCount": "1",
+    "visitPurpose": "Exam duty arrangement",
+    "stayDays": "5",
+    "applicantSignature": "Amit Kumar",
+    "applicantNameAndEmployeeId": "Amit Kumar | EMP-2755",
+    "applicantDesignationDepartment": "Section Officer | Examination Cell",
+    "mobileNumberLabel": "Mobile No",
+    "applicantMobileNumber": "+91 98444 22019",
+    "emailId": "amit.kumar@example.com",
+    "paymentModes": [
+      { "label": "By Guest", "checked": true },
+      { "label": "By Applicant", "checked": false },
+      { "label": "University A/C", "checked": false },
+      { "label": "Special Fund/Project A/C", "checked": false }
+    ]
+  },
+  "SSB-302": {
+    "guestName": "Ms. Sana Qureshi",
+    "guestDesignation": "Research Speaker",
+    "guestAddress": "31 Bhopal Road, Indore - 452001",
+    "guestMobileNumber": "+91 98100 66666",
+    "accompanyingPersons": [
+      { "name": "Fahad Ali", "relationship": "Research Associate" }
+    ],
+    "roomCount": "1",
+    "visitPurpose": "Seminar participation",
+    "stayDays": "5",
+    "applicantSignature": "Sanaya Kumari",
+    "applicantNameAndEmployeeId": "Sanaya Kumari | EMP-3016",
+    "applicantDesignationDepartment": "Project Associate | Research Office",
+    "mobileNumberLabel": "Mobile No",
+    "applicantMobileNumber": "+91 98555 13007",
+    "emailId": "sanaya.kumari@example.com",
+    "paymentModes": [
+      { "label": "By Guest", "checked": false },
+      { "label": "By Applicant", "checked": true },
+      { "label": "University A/C", "checked": false },
+      { "label": "Special Fund/Project A/C", "checked": false }
+    ]
+  }
+}

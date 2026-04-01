@@ -1,38 +1,500 @@
-.App {
+:root {
+  --gov-blue: #17375e;
+  --gov-blue-dark: #102844;
+  --gov-border: #b9c4cf;
+  --gov-muted: #5f6f82;
+  --gov-bg: #f3f6f8;
+  --gov-surface: #ffffff;
+  --gov-header: #e8edf3;
+  --gov-success-bg: #e7f4ea;
+  --gov-success-text: #1f5f2c;
+  --gov-warning-bg: #fff4dd;
+  --gov-warning-text: #8a5a00;
+  --gov-info-bg: #e7eef8;
+  --gov-info-text: #1e4f8a;
+  --gov-danger-bg: #fdeceb;
+  --gov-danger-text: #a12622;
+}
+
+.page-shell {
+  min-height: 100vh;
+  padding: 20px 16px 40px;
+  background: var(--gov-bg);
+  color: var(--gov-blue-dark);
+}
+
+.hero-section,
+.section-block {
+  width: min(1280px, 100%);
+  margin: 0 auto;
+}
+
+.hero-section {
+  margin-bottom: 18px;
+  padding: 18px 22px;
+  border: 1px solid var(--gov-border);
+  border-top: 4px solid #b97171;
+  border-radius: 0;
+  background: var(--gov-surface);
+  box-shadow: none;
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--gov-muted);
+}
+
+.hero-section h1,
+.section-heading h2,
+.card h3 {
+  margin: 0;
+}
+
+.hero-section h1 {
+  font-size: clamp(1.75rem, 3vw, 2.4rem);
+  line-height: 1.2;
+  color: var(--gov-blue);
+}
+
+.hero-copy,
+.section-heading p,
+.card-meta,
+.details-card p,
+.empty-state p,
+.confirmation-body p {
+  color: var(--gov-muted);
+}
+
+.hero-copy {
+  max-width: 760px;
+  margin: 10px 0 0;
+  line-height: 1.6;
+}
+
+.section-block {
+  padding: 20px;
+  border: 1px solid var(--gov-border);
+  border-radius: 0;
+  background: var(--gov-surface);
+  box-shadow: none;
+}
+
+.section-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--gov-border);
+}
+
+.section-heading h2 {
+  font-size: 1.55rem;
+  color: var(--gov-blue);
+}
+
+.section-heading p {
+  margin: 0;
+}
+
+.guest-house-filter-row {
+  align-items: center;
+}
+
+.guest-house-dropdown-field {
+  min-width: 320px;
+  margin-bottom: 0;
+}
+
+.guest-house-dropdown-field select {
+  width: 100%;
+  min-height: 40px;
+  padding: 8px 10px;
+  border: 1px solid #98a8b9;
+  border-radius: 0;
+  font: inherit;
+  color: var(--gov-blue-dark);
+  background: #ffffff;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.card,
+.booking-card {
+  border: 1px solid var(--gov-border);
+  border-radius: 0;
+  background: var(--gov-surface);
+  box-shadow: none;
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease;
+}
+
+.guest-house-card,
+.details-card,
+.empty-state {
+  padding: 20px;
+}
+
+.guest-house-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.guest-house-button {
+  width: 100%;
+  padding: 20px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.card:hover,
+.booking-card:hover {
+  background: #f8fafc;
+}
+
+.card-selected,
+.selected-table-row td {
+  border-color: var(--gov-blue);
+  background: #eef4fb;
+}
+
+.card-label,
+.detail-item span,
+.search-field span,
+.detail-badge,
+.payment-item span {
+  display: inline-block;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--gov-muted);
+}
+
+.card-label {
+  margin-bottom: 6px;
+}
+
+.card-meta {
+  margin: 8px 0 0;
+  line-height: 1.5;
+}
+
+.button-primary,
+.button-secondary,
+.modal-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 8px 16px;
+  border: 1px solid var(--gov-blue);
+  border-radius: 0;
+  font: inherit;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: none;
+}
+
+.button-primary {
+  color: #ffffff;
+  background: var(--gov-blue);
+}
+
+.button-primary:hover,
+.button-secondary:hover,
+.modal-close:hover {
+  background: #dfe8f2;
+  color: var(--gov-blue-dark);
+}
+
+.button-primary:hover {
+  background: var(--gov-blue-dark);
+  color: #ffffff;
+}
+
+.button-secondary,
+.modal-close {
+  color: var(--gov-blue-dark);
+  background: #ffffff;
+  border-color: var(--gov-border);
+}
+
+.inline-button {
+  margin-bottom: 18px;
+}
+
+.search-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.search-field input,
+.room-select-field select {
+  width: 100%;
+  min-height: 40px;
+  padding: 8px 10px;
+  border: 1px solid #98a8b9;
+  border-radius: 0;
+  font: inherit;
+  color: var(--gov-blue-dark);
+  background: #ffffff;
+  box-sizing: border-box;
+}
+
+.search-field input:focus,
+.room-select-field select:focus {
+  outline: 1px solid var(--gov-blue);
+  border-color: var(--gov-blue);
+}
+
+.status-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 10px;
+  border: 1px solid transparent;
+  border-radius: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.status-pending {
+  background: var(--gov-warning-bg);
+  color: var(--gov-warning-text);
+  border-color: #e6d19b;
+}
+
+.status-approved {
+  background: var(--gov-success-bg);
+  color: var(--gov-success-text);
+  border-color: #b8d8bd;
+}
+
+.status-under-review {
+  background: var(--gov-info-bg);
+  color: var(--gov-info-text);
+  border-color: #b8cbe5;
+}
+
+.status-rejected {
+  background: var(--gov-danger-bg);
+  color: var(--gov-danger-text);
+  border-color: #e2b8b5;
+}
+
+.table-shell {
+  overflow-x: auto;
+  border: 1px solid var(--gov-border);
+  border-radius: 0;
+  background: #ffffff;
+}
+
+.booking-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 920px;
+}
+
+.booking-table th,
+.booking-table td {
+  padding: 12px 14px;
+  border: 1px solid #d2dae3;
+  text-align: left;
+  vertical-align: top;
+}
+
+.booking-table th {
+  background: var(--gov-header);
+  color: var(--gov-blue);
+  font-size: 0.82rem;
+}
+
+.booking-table td {
+  color: var(--gov-blue-dark);
+  background: #ffffff;
+}
+
+.booking-table-row {
+  cursor: pointer;
+}
+
+.booking-table tbody tr:hover td {
+  background: #f7fafc;
+}
+
+.admin-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.detail-item {
+  padding: 12px;
+  border: 1px solid #d7dee6;
+  border-radius: 0;
+  background: #f8fafc;
+}
+
+.detail-item-wide {
+  grid-column: 1 / -1;
+}
+
+.detail-item strong {
+  display: block;
+  margin-top: 6px;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  color: var(--gov-blue-dark);
+}
+
+.admin-actions {
+  margin-top: 18px;
+}
+
+.admin-date-grid {
+  margin-bottom: 8px;
+}
+
+.admin-hint,
+.admin-error {
+  margin: 0 0 12px;
+  font-size: 0.9rem;
+}
+
+.admin-hint {
+  color: var(--gov-warning-text);
+}
+
+.admin-error {
+  color: var(--gov-danger-text);
+}
+
+.action-button-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.room-box-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.room-select-box {
+  min-width: 88px;
+  padding: 10px 12px;
+  border: 1px solid #98a8b9;
+  background: #ffffff;
+  color: var(--gov-blue-dark);
+  cursor: pointer;
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.room-select-box strong {
+  display: block;
+  font-size: 0.95rem;
+  line-height: 1.2;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.room-select-box span {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.78rem;
+  color: var(--gov-muted);
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.room-select-box-active {
+  border-color: var(--gov-blue);
+  background: #eef4fb;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  padding: 18px;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: none;
 }
 
-.App-link {
-  color: #61dafb;
+.modal-card {
+  width: min(920px, 100%);
+  max-height: calc(100vh - 36px);
+  overflow-y: auto;
+  padding: 20px;
+  border: 1px solid #7f8fa2;
+  border-top: 4px solid var(--gov-blue);
+  border-radius: 0;
+  background: #ffffff;
+  box-shadow: none;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+.confirmation-card {
+  width: min(440px, 100%);
+}
+
+.confirmation-card h2,
+.modal-card h2 {
+  color: var(--gov-blue);
+}
+
+.confirmation-body {
+  margin: 16px 0 20px;
+}
+
+.confirmation-body p {
+  margin: 0 0 8px;
+}
+
+.modal-heading {
+  align-items: flex-start;
+}
+
+@media (max-width: 900px) {
+  .section-heading {
+    flex-direction: column;
+    align-items: flex-start;
   }
-  to {
-    transform: rotate(360deg);
+}
+
+@media (max-width: 640px) {
+  .page-shell {
+    padding: 12px 10px 24px;
+  }
+
+  .hero-section,
+  .section-block,
+  .modal-card {
+    padding: 14px;
+  }
+
+  .section-heading h2,
+  .hero-section h1 {
+    line-height: 1.25;
   }
 }
