@@ -1,6 +1,6 @@
 :root {
   color-scheme: light;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
 * {
@@ -14,12 +14,23 @@ html {
 body {
   margin: 0;
   min-width: 320px;
+  background: #f5f0e6;
+  color: #0d2340;
 }
 
 body,
 button,
-input {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+input,
+select {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: Georgia, "Times New Roman", serif;
+  letter-spacing: 0.005em;
 }
 
 a,

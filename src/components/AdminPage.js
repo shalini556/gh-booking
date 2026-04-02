@@ -3,9 +3,31 @@ import { getAvailableRooms } from "../utils/roomAllotment";
 
 function AdminPage({ bookingData, onUpdateRequest }) {
   const [selectedGuestHouseName, setSelectedGuestHouseName] = useState("");
+  const [bookingIdFilter, setBookingIdFilter] = useState("");
+  const [bookingTypeFilter, setBookingTypeFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
   const [adminError, setAdminError] = useState("");
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [confirmationNotice, setConfirmationNotice] = useState(null);
+  const getDisplayCheckIn = (request) =>
+    request.status === "Approved"
+      ? request.allottedCheckIn || request.checkIn || "-"
+      : request.checkIn || "-";
+  const getDisplayCheckOut = (request) =>
+    request.status === "Approved"
+      ? request.allottedCheckOut || request.checkOut || "-"
+      : request.checkOut || "-";
+  const getAssignedRoomLabel = (request) => {
+    if (request.status !== "Approved") {
+      return "-";
+    }
+
+    if (request.assignedRooms?.length) {
+      return request.assignedRooms.join(", ");
+    }
+
+    return request.assignedRoom || "-";
+  };
 
   const selectedGuestHouseFilter = useMemo(
     () =>
@@ -28,6 +50,28 @@ function AdminPage({ bookingData, onUpdateRequest }) {
       ),
     [bookingData, selectedGuestHouseFilter],
   );
+
+  const bookingTypes = useMemo(
+    () => [...new Set(allRequests.map((request) => request.bookingType))],
+    [allRequests],
+  );
+
+  const statusOptions = useMemo(
+    () => [...new Set(allRequests.map((request) => request.status))],
+    [allRequests],
+  );
+
+  const filteredRequests = useMemo(() => {
+    const normalizedBookingId = bookingIdFilter.trim().toLowerCase();
+
+    return allRequests.filter((request) => {
+      return (
+        request.requestId.toLowerCase().includes(normalizedBookingId) &&
+        (!bookingTypeFilter || request.bookingType === bookingTypeFilter) &&
+        (!statusFilter || request.status === statusFilter)
+      );
+    });
+  }, [allRequests, bookingIdFilter, bookingTypeFilter, statusFilter]);
 
   const [selectedRequestId, setSelectedRequestId] = useState("");
   const [selectedRooms, setSelectedRooms] = useState([]);
@@ -133,7 +177,7 @@ function AdminPage({ bookingData, onUpdateRequest }) {
       </section>
 
       <section className="admin-layout">
-        <section className="section-block">
+        <section className="section-block section-block-compact">
           <div className="section-heading guest-house-filter-row">
             <h2>Select Guest House</h2>
             <label
@@ -169,53 +213,114 @@ function AdminPage({ bookingData, onUpdateRequest }) {
             </p>
           </div>
 
-          <div className="table-shell">
-            <table className="booking-table">
-              <thead>
-                <tr>
-                  <th>Booking ID</th>
-                  <th>Applicant</th>
-                  <th>Type</th>
-                  <th>No. of Guest</th>
-                  <th>Start Date</th>
-                  <th>End Date</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {allRequests.map((request) => (
-                  <tr
-                    className={`booking-table-row ${
-                      selectedRequestId === request.requestId
-                        ? "selected-table-row"
-                        : ""
-                    }`}
-                    key={request.requestId}
-                    onClick={() => {
-                      setSelectedRequestId(request.requestId);
-                      setIsDetailModalOpen(true);
-                    }}
-                  >
-                    <td>{request.requestId}</td>
-                    <td>{request.applicantName}</td>
-                    <td>{request.bookingType}</td>
-                    <td>{request.numberOfGuests}</td>
-                    <td>{request.checkIn}</td>
-                    <td>{request.checkOut}</td>
-                    <td>
-                      <span
-                        className={`status-chip status-${request.status
-                          .toLowerCase()
-                          .replace(/\s+/g, "-")}`}
+          <section className="filter-toolbar" aria-label="Booking request filters">
+            <div className="filter-grid">
+              <label className="search-field" htmlFor="admin-request-id-filter">
+                <span className="sr-only">Booking ID Filter</span>
+                <input
+                  className="filter-control"
+                  id="admin-request-id-filter"
+                  type="text"
+                  placeholder="Search..."
+                  value={bookingIdFilter}
+                  onChange={(event) => setBookingIdFilter(event.target.value)}
+                />
+              </label>
+
+              <label className="search-field" htmlFor="admin-booking-type-filter">
+                <span className="sr-only">Booking Type Filter</span>
+                <select
+                  className="filter-control"
+                  id="admin-booking-type-filter"
+                  value={bookingTypeFilter}
+                  onChange={(event) => setBookingTypeFilter(event.target.value)}
+                >
+                  <option value="">Booking Type</option>
+                  {bookingTypes.map((type) => (
+                    <option key={type} value={type}>
+                      {type}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label className="search-field" htmlFor="admin-status-filter">
+                <span className="sr-only">Status Filter</span>
+                <select
+                  className="filter-control"
+                  id="admin-status-filter"
+                  value={statusFilter}
+                  onChange={(event) => setStatusFilter(event.target.value)}
+                >
+                  <option value="">Status</option>
+                  {statusOptions.map((status) => (
+                    <option key={status} value={status}>
+                      {status}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+          </section>
+
+          {filteredRequests.length ? (
+            <div className="table-shell">
+              <table className="booking-table">
+                <thead>
+                  <tr>
+                    <th>Booking ID</th>
+                    <th>Applicant</th>
+                    <th>Guest House Name</th>
+                    <th>Type</th>
+                    <th>No. of Guest</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Room</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredRequests.map((request) => (
+                    <tr
+                      className={`booking-table-row ${
+                        selectedRequestId === request.requestId
+                          ? "selected-table-row"
+                          : ""
+                      }`}
+                      key={request.requestId}
+                      onClick={() => {
+                        setSelectedRequestId(request.requestId);
+                        setIsDetailModalOpen(true);
+                      }}
                     >
-                      {request.status}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-              </tbody>
-            </table>
-          </div>
+                      <td>{request.requestId}</td>
+                      <td>{request.applicantName}</td>
+                      <td>{request.guestHouseName}</td>
+                      <td>{request.bookingType}</td>
+                      <td>{request.numberOfGuests}</td>
+                      <td>{getDisplayCheckIn(request)}</td>
+                      <td>{getDisplayCheckOut(request)}</td>
+                      <td>{getAssignedRoomLabel(request)}</td>
+                      <td>
+                        <span
+                          className={`status-chip status-${request.status
+                            .toLowerCase()
+                            .replace(/\s+/g, "-")}`}
+                        >
+                          {request.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <article className="card empty-state">
+              <h3>No matching requests</h3>
+              <p>Try a different booking ID, type, or status filter.</p>
+            </article>
+          )}
         </section>
 
         {selectedRequest && selectedGuestHouse && isDetailModalOpen ? (
@@ -276,9 +381,14 @@ function AdminPage({ bookingData, onUpdateRequest }) {
                   <strong>{selectedRequest.numberOfGuests}</strong>
                 </div>
                 <div className="detail-item">
-                  <span>Requested Dates</span>
+                  <span>
+                    {selectedRequest.status === "Approved"
+                      ? "Allotted Dates"
+                      : "Requested Dates"}
+                  </span>
                   <strong>
-                    {selectedRequest.checkIn} to {selectedRequest.checkOut}
+                    {getDisplayCheckIn(selectedRequest)} to{" "}
+                    {getDisplayCheckOut(selectedRequest)}
                   </strong>
                 </div>
                 <div className="detail-item">

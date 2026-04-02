@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AdminPage from "./components/AdminPage";
 import guestHouseData from "./data/guestHouseData.json";
 import {
@@ -8,8 +8,31 @@ import {
 } from "./utils/roomAllotment";
 import "./App.css";
 
+const BOOKING_DATA_STORAGE_KEY = "booking-project1-admin-data";
+
 function App() {
-  const [bookingData, setBookingData] = useState(guestHouseData);
+  const [bookingData, setBookingData] = useState(() => {
+    const savedBookingData = window.localStorage.getItem(
+      BOOKING_DATA_STORAGE_KEY,
+    );
+
+    if (!savedBookingData) {
+      return guestHouseData;
+    }
+
+    try {
+      return JSON.parse(savedBookingData);
+    } catch (error) {
+      return guestHouseData;
+    }
+  });
+
+  useEffect(() => {
+    window.localStorage.setItem(
+      BOOKING_DATA_STORAGE_KEY,
+      JSON.stringify(bookingData),
+    );
+  }, [bookingData]);
 
   const handleUpdateRequest = ({
     guestHouseName,

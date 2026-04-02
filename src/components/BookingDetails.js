@@ -1,6 +1,15 @@
 import bookingRequestFormData from "../data/bookingRequestFormData.json";
 
 function BookingDetails({ request }) {
+  const displayCheckIn =
+    request?.status === "Approved"
+      ? request?.allottedCheckIn || request?.checkIn || "-"
+      : request?.checkIn || "-";
+  const displayCheckOut =
+    request?.status === "Approved"
+      ? request?.allottedCheckOut || request?.checkOut || "-"
+      : request?.checkOut || "-";
+
   if (!request) {
     return (
       <section className="section-block details-panel">
@@ -21,6 +30,11 @@ function BookingDetails({ request }) {
   }
 
   const formData = bookingRequestFormData[request.requestId];
+  const accompanyingGuests = formData?.accompanyingPersons?.length
+    ? formData.accompanyingPersons
+        .map((person) => `${person.name} (${person.relationship})`)
+        .join(", ")
+    : "No accompanying guest mentioned";
 
   if (!formData) {
     return (
@@ -45,16 +59,57 @@ function BookingDetails({ request }) {
         <p>{request.requestId}</p>
       </div>
 
-      <article className="card details-card">
-        <div className="detail-badge">Booking Request Form</div>
-        <h3>{formData.guestName}</h3>
-        <p className="details-lead">
-          {request.stayLocation} | {request.status}
-        </p>
+      <article className="card details-card details-card-university">
+        <div className="details-card-topbar">
+          <div>
+            <div className="detail-badge">University Guest House Booking</div>
+            <h3>{formData.guestName}</h3>
+            <p className="details-lead">
+              Guest accommodation request for {request.stayLocation}
+            </p>
+          </div>
+          <span
+            className={`status-chip status-${request.status
+              .toLowerCase()
+              .replace(/\s+/g, "-")} details-status-chip`}
+          >
+            {request.status}
+          </span>
+        </div>
+
+        <div className="details-summary-grid">
+          <div className="details-summary-item">
+            <span>Booking ID</span>
+            <strong>{request.requestId}</strong>
+          </div>
+          <div className="details-summary-item">
+            <span>Guest House</span>
+            <strong>{request.stayLocation}</strong>
+          </div>
+          <div className="details-summary-item">
+            <span>Check In</span>
+            <strong>{displayCheckIn}</strong>
+          </div>
+          <div className="details-summary-item">
+            <span>Check Out</span>
+            <strong>{displayCheckOut}</strong>
+          </div>
+          <div className="details-summary-item">
+            <span>Guests</span>
+            <strong>{request.numberOfGuests}</strong>
+          </div>
+          <div className="details-summary-item">
+            <span>Booking Type</span>
+            <strong>{request.bookingType}</strong>
+          </div>
+        </div>
 
         <div className="form-layout">
-          <div className="form-section">
-            <h4>Guest Details</h4>
+          <div className="form-section form-section-highlight">
+            <div className="form-section-heading">
+              <h4>Guest Details</h4>
+              <p>Primary guest information submitted with this request.</p>
+            </div>
             <div className="details-grid">
               <div className="detail-item">
                 <span>Name of the Guest</span>
@@ -71,18 +126,8 @@ function BookingDetails({ request }) {
                 </strong>
               </div>
               <div className="detail-item detail-item-wide">
-                <span>
-                  Name(s) of person(s) accompanying the Guest and relationship
-                  with the Guest
-                </span>
-                <strong>
-                  {formData.accompanyingPersons
-                    .map(
-                      (person) =>
-                        `${person.name} (${person.relationship})`,
-                    )
-                    .join(", ")}
-                </strong>
+                <span>Accompanying Guest(s) & Relationship</span>
+                <strong>{accompanyingGuests}</strong>
               </div>
               <div className="detail-item">
                 <span>Number of Room(s)</span>
@@ -93,18 +138,21 @@ function BookingDetails({ request }) {
                 <strong>{formData.visitPurpose}</strong>
               </div>
               <div className="detail-item">
-                <span>Details of Stay No. of Days</span>
+                <span>Duration of Stay</span>
                 <strong>{formData.stayDays}</strong>
               </div>
               <div className="detail-item">
-                <span>Applicant Signatures</span>
+                <span>Applicant Signature</span>
                 <strong>{formData.applicantSignature}</strong>
               </div>
             </div>
           </div>
 
           <div className="form-section">
-            <h4>Applicant Details</h4>
+            <div className="form-section-heading">
+              <h4>Applicant Details</h4>
+              <p>Contact and office information of the booking applicant.</p>
+            </div>
             <div className="details-grid">
               <div className="detail-item">
                 <span>Name & E.ID. No.</span>
@@ -126,12 +174,17 @@ function BookingDetails({ request }) {
           </div>
 
           <div className="form-section">
-            <h4>Mode of Payment</h4>
+            <div className="form-section-heading">
+              <h4>Mode of Payment</h4>
+              <p>Payment preference chosen in the submitted request.</p>
+            </div>
             <div className="payment-grid">
               {formData.paymentModes.map((mode) => (
                 <div className="payment-item" key={mode.label}>
-                  <span className={`payment-check ${mode.checked ? "checked" : ""}`}>
-                    {mode.checked ? "Yes" : "No"}
+                  <span
+                    className={`payment-check ${mode.checked ? "checked" : ""}`}
+                  >
+                    {mode.checked ? "Selected" : "Not selected"}
                   </span>
                   <strong>{mode.label}</strong>
                 </div>
