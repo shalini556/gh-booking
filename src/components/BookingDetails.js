@@ -1,6 +1,15 @@
+import {
+  Grid,
+  Header,
+  Label,
+  Message,
+  Segment,
+} from "semantic-ui-react";
 import bookingRequestFormData from "../data/bookingRequestFormData.json";
 
 function BookingDetails({ request }) {
+  const getDisplayBookingType = (bookingType) =>
+    bookingType === "Other" ? "Official" : bookingType;
   const displayCheckIn =
     request?.status === "Approved"
       ? request?.allottedCheckIn || request?.checkIn || "-"
@@ -10,22 +19,28 @@ function BookingDetails({ request }) {
       ? request?.allottedCheckOut || request?.checkOut || "-"
       : request?.checkOut || "-";
 
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "Approved":
+        return "green";
+      case "Under Review":
+        return "blue";
+      case "Rejected":
+        return "red";
+      default:
+        return "yellow";
+    }
+  };
+
   if (!request) {
     return (
-      <section className="section-block details-panel">
-        <div className="section-heading">
-          <h2>Request Form</h2>
-          <p>Booking request preview</p>
-        </div>
-
-        <article className="card details-card empty-state">
-          <h3>Select a request</h3>
-          <p>
-            The full booking request form will appear here for the selected
-            request ID.
-          </p>
-        </article>
-      </section>
+      <Segment className="semantic-panel">
+        <Header as="h2">Request Form</Header>
+        <Message info>
+          <Message.Header>Select a request</Message.Header>
+          <p>The full booking request form will appear here for the selected request ID.</p>
+        </Message>
+      </Segment>
     );
   }
 
@@ -38,162 +53,155 @@ function BookingDetails({ request }) {
 
   if (!formData) {
     return (
-      <section className="section-block details-panel">
-        <div className="section-heading">
-          <h2>Request Form</h2>
-          <p>{request.requestId}</p>
-        </div>
-
-        <article className="card details-card empty-state">
-          <h3>Form data not available</h3>
+      <Segment className="semantic-panel">
+        <Header as="h2">Request Form</Header>
+        <Message warning>
+          <Message.Header>Form data not available</Message.Header>
           <p>No form JSON entry was found for this booking request ID.</p>
-        </article>
-      </section>
+        </Message>
+      </Segment>
     );
   }
 
   return (
-    <section className="section-block details-panel">
-      <div className="section-heading">
-        <h2>Request Form</h2>
-        <p>{request.requestId}</p>
+    <Segment className="semantic-panel">
+      <div className="semantic-section-head">
+        <div>
+          <Header as="h2" className="semantic-section-title">
+            Request Form
+          </Header>
+          <p className="semantic-section-copy">{request.requestId}</p>
+        </div>
+        <Label color={getStatusColor(request.status)} size="large">
+          {request.status}
+        </Label>
       </div>
 
-      <article className="card details-card details-card-university">
-        <div className="details-card-topbar">
-          <div>
-            <div className="detail-badge">University Guest House Booking</div>
-            <h3>{formData.guestName}</h3>
-            <p className="details-lead">
-              Guest accommodation request for {request.stayLocation}
-            </p>
-          </div>
-          <span
-            className={`status-chip status-${request.status
-              .toLowerCase()
-              .replace(/\s+/g, "-")} details-status-chip`}
-          >
-            {request.status}
-          </span>
-        </div>
+      <Segment className="semantic-summary-band">
+        <Header as="h3" className="semantic-summary-title">
+          {formData.guestName}
+        </Header>
+        <p className="semantic-section-copy">
+          Guest accommodation request for {request.stayLocation}
+        </p>
+        <Grid columns={6} stackable className="semantic-summary-grid">
+          <Grid.Column>
+            <strong>Booking ID</strong>
+            <p>{request.requestId}</p>
+          </Grid.Column>
+          <Grid.Column>
+            <strong>Guest House</strong>
+            <p>{request.stayLocation}</p>
+          </Grid.Column>
+          <Grid.Column>
+            <strong>Check In</strong>
+            <p>{displayCheckIn}</p>
+          </Grid.Column>
+          <Grid.Column>
+            <strong>Check Out</strong>
+            <p>{displayCheckOut}</p>
+          </Grid.Column>
+          <Grid.Column>
+            <strong>Guests</strong>
+            <p>{request.numberOfGuests}</p>
+          </Grid.Column>
+          <Grid.Column>
+            <strong>Booking Type</strong>
+            <p>{getDisplayBookingType(request.bookingType)}</p>
+          </Grid.Column>
+        </Grid>
+      </Segment>
 
-        <div className="details-summary-grid">
-          <div className="details-summary-item">
-            <span>Booking ID</span>
-            <strong>{request.requestId}</strong>
-          </div>
-          <div className="details-summary-item">
-            <span>Guest House</span>
-            <strong>{request.stayLocation}</strong>
-          </div>
-          <div className="details-summary-item">
-            <span>Check In</span>
-            <strong>{displayCheckIn}</strong>
-          </div>
-          <div className="details-summary-item">
-            <span>Check Out</span>
-            <strong>{displayCheckOut}</strong>
-          </div>
-          <div className="details-summary-item">
-            <span>Guests</span>
-            <strong>{request.numberOfGuests}</strong>
-          </div>
-          <div className="details-summary-item">
-            <span>Booking Type</span>
-            <strong>{request.bookingType}</strong>
-          </div>
-        </div>
-
-        <div className="form-layout">
-          <div className="form-section form-section-highlight">
-            <div className="form-section-heading">
-              <h4>Guest Details</h4>
-              <p>Primary guest information submitted with this request.</p>
-            </div>
-            <div className="details-grid">
-              <div className="detail-item">
-                <span>Name of the Guest</span>
-                <strong>{formData.guestName}</strong>
-              </div>
-              <div className="detail-item">
-                <span>Designation</span>
-                <strong>{formData.guestDesignation}</strong>
-              </div>
-              <div className="detail-item detail-item-wide">
-                <span>Full Address & Mobile Number</span>
-                <strong>
+      <Grid stackable columns={1} className="semantic-detail-sections">
+        <Grid.Column>
+          <Segment>
+            <Header as="h4">Guest Details</Header>
+            <Grid columns={2} stackable>
+              <Grid.Column>
+                <strong>Name of the Guest</strong>
+                <p>{formData.guestName}</p>
+              </Grid.Column>
+              <Grid.Column>
+                <strong>Designation</strong>
+                <p>{formData.guestDesignation}</p>
+              </Grid.Column>
+              <Grid.Column width={16}>
+                <strong>Full Address & Mobile Number</strong>
+                <p>
                   {formData.guestAddress} | {formData.guestMobileNumber}
-                </strong>
-              </div>
-              <div className="detail-item detail-item-wide">
-                <span>Accompanying Guest(s) & Relationship</span>
-                <strong>{accompanyingGuests}</strong>
-              </div>
-              <div className="detail-item">
-                <span>Number of Room(s)</span>
-                <strong>{formData.roomCount}</strong>
-              </div>
-              <div className="detail-item">
-                <span>Purpose of Visit</span>
-                <strong>{formData.visitPurpose}</strong>
-              </div>
-              <div className="detail-item">
-                <span>Duration of Stay</span>
-                <strong>{formData.stayDays}</strong>
-              </div>
-              <div className="detail-item">
-                <span>Applicant Signature</span>
-                <strong>{formData.applicantSignature}</strong>
-              </div>
-            </div>
-          </div>
+                </p>
+              </Grid.Column>
+              <Grid.Column width={16}>
+                <strong>Accompanying Guest(s) & Relationship</strong>
+                <p>{accompanyingGuests}</p>
+              </Grid.Column>
+              <Grid.Column>
+                <strong>Number of Room(s)</strong>
+                <p>{formData.roomCount}</p>
+              </Grid.Column>
+              <Grid.Column>
+                <strong>Purpose of Visit</strong>
+                <p>{formData.visitPurpose}</p>
+              </Grid.Column>
+              <Grid.Column>
+                <strong>Duration of Stay</strong>
+                <p>{formData.stayDays}</p>
+              </Grid.Column>
+              <Grid.Column>
+                <strong>Applicant Signature</strong>
+                <p>{formData.applicantSignature}</p>
+              </Grid.Column>
+            </Grid>
+          </Segment>
+        </Grid.Column>
 
-          <div className="form-section">
-            <div className="form-section-heading">
-              <h4>Applicant Details</h4>
-              <p>Contact and office information of the booking applicant.</p>
-            </div>
-            <div className="details-grid">
-              <div className="detail-item">
-                <span>Name & E.ID. No.</span>
-                <strong>{formData.applicantNameAndEmployeeId}</strong>
-              </div>
-              <div className="detail-item">
-                <span>Designation & Department</span>
-                <strong>{formData.applicantDesignationDepartment}</strong>
-              </div>
-              <div className="detail-item">
-                <span>{formData.mobileNumberLabel}</span>
-                <strong>{formData.applicantMobileNumber}</strong>
-              </div>
-              <div className="detail-item">
-                <span>E-Mail ID</span>
-                <strong>{formData.emailId}</strong>
-              </div>
-            </div>
-          </div>
+        <Grid.Column>
+          <Segment>
+            <Header as="h4">Applicant Details</Header>
+            <Grid columns={2} stackable>
+              <Grid.Column>
+                <strong>Name & E.ID. No.</strong>
+                <p>{formData.applicantNameAndEmployeeId}</p>
+              </Grid.Column>
+              <Grid.Column>
+                <strong>Designation & Department</strong>
+                <p>{formData.applicantDesignationDepartment}</p>
+              </Grid.Column>
+              <Grid.Column>
+                <strong>{formData.mobileNumberLabel}</strong>
+                <p>{formData.applicantMobileNumber}</p>
+              </Grid.Column>
+              <Grid.Column>
+                <strong>E-Mail ID</strong>
+                <p>{formData.emailId}</p>
+              </Grid.Column>
+            </Grid>
+          </Segment>
+        </Grid.Column>
 
-          <div className="form-section">
-            <div className="form-section-heading">
-              <h4>Mode of Payment</h4>
-              <p>Payment preference chosen in the submitted request.</p>
-            </div>
-            <div className="payment-grid">
+        <Grid.Column>
+          <Segment>
+            <Header as="h4">Mode of Payment</Header>
+            <Grid columns={3} stackable>
               {formData.paymentModes.map((mode) => (
-                <div className="payment-item" key={mode.label}>
-                  <span
-                    className={`payment-check ${mode.checked ? "checked" : ""}`}
-                  >
-                    {mode.checked ? "Selected" : "Not selected"}
-                  </span>
-                  <strong>{mode.label}</strong>
-                </div>
+                <Grid.Column key={mode.label}>
+                  <Segment className="semantic-payment-card">
+                    <Label
+                      color={mode.checked ? "green" : "grey"}
+                      size="small"
+                      ribbon
+                    >
+                      {mode.checked ? "Selected" : "Not selected"}
+                    </Label>
+                    <Header as="h5">{mode.label}</Header>
+                  </Segment>
+                </Grid.Column>
               ))}
-            </div>
-          </div>
-        </div>
-      </article>
-    </section>
+            </Grid>
+          </Segment>
+        </Grid.Column>
+      </Grid>
+    </Segment>
   );
 }
 

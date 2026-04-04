@@ -1,4 +1,13 @@
 import { useMemo, useState } from "react";
+import {
+  Button,
+  Form,
+  Header,
+  Label,
+  Message,
+  Segment,
+  Table,
+} from "semantic-ui-react";
 import BookingDetails from "./BookingDetails";
 
 function BookingList({ guestHouse }) {
@@ -6,6 +15,7 @@ function BookingList({ guestHouse }) {
   const [bookingTypeFilter, setBookingTypeFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [selectedRequestId, setSelectedRequestId] = useState("");
+
   const getDisplayCheckIn = (request) =>
     request.status === "Approved"
       ? request.allottedCheckIn || request.checkIn || "-"
@@ -15,7 +25,6 @@ function BookingList({ guestHouse }) {
       ? request.allottedCheckOut || request.checkOut || "-"
       : request.checkOut || "-";
 
-  const requests = guestHouse.requests;
   const getAssignedRoomLabel = (request) => {
     if (request.status !== "Approved") {
       return "-";
@@ -27,6 +36,24 @@ function BookingList({ guestHouse }) {
 
     return request.assignedRoom || "-";
   };
+
+  const getDisplayBookingType = (bookingType) =>
+    bookingType === "Other" ? "Official" : bookingType;
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "Approved":
+        return "green";
+      case "Under Review":
+        return "blue";
+      case "Rejected":
+        return "red";
+      default:
+        return "yellow";
+    }
+  };
+
+  const requests = guestHouse.requests;
 
   const bookingTypes = useMemo(
     () => [...new Set(requests.map((request) => request.bookingType))],
@@ -60,21 +87,18 @@ function BookingList({ guestHouse }) {
   if (selectedRequest) {
     return (
       <>
-        <section className="hero-section compact">
-          <p className="eyebrow">Booking Request Form</p>
-          <h1>{selectedRequest.requestId}</h1>
-          <p className="hero-copy">
-            Filled form details for {selectedRequest.applicantName} are shown
-            below.
+        <Segment className="semantic-hero semantic-subhero" padded="very">
+          <span className="semantic-eyebrow">Booking Request Form</span>
+          <Header as="h1" inverted className="semantic-hero-title">
+            {selectedRequest.requestId}
+          </Header>
+          <p className="semantic-hero-copy">
+            Filled form details for {selectedRequest.applicantName} are shown below.
           </p>
-          <button
-            className="button-secondary inline-button"
-            onClick={() => setSelectedRequestId("")}
-            type="button"
-          >
+          <Button onClick={() => setSelectedRequestId("")}>
             Back to Booking Requests
-          </button>
-        </section>
+          </Button>
+        </Segment>
 
         <BookingDetails request={selectedRequest} />
       </>
@@ -82,113 +106,96 @@ function BookingList({ guestHouse }) {
   }
 
   return (
-    <section className="section-block booking-table-section">
-      <div className="section-heading">
-        <h2>Booking Requests {guestHouse.name}</h2>
-      </div>
+    <Segment className="semantic-panel">
+      <Header as="h2" className="semantic-section-title">
+        Booking Requests {guestHouse.name}
+      </Header>
 
-      <section className="filter-toolbar" aria-label="Booking request filters">
-        <div className="filter-grid">
-        <label className="search-field" htmlFor="request-id-filter">
-          <span className="sr-only">Booking ID Filter</span>
-          <input
-            className="filter-control"
-            id="request-id-filter"
-            type="text"
-            placeholder="Search..."
+      <Form className="semantic-filter-form">
+        <Form.Group widths="equal">
+          <Form.Input
+            icon="search"
+            iconPosition="left"
+            placeholder="Search booking ID"
             value={bookingIdFilter}
             onChange={(event) => setBookingIdFilter(event.target.value)}
           />
-        </label>
-
-        <label className="search-field" htmlFor="booking-type-filter">
-          <span className="sr-only">Booking Type Filter</span>
-          <select
-            className="filter-control"
-            id="booking-type-filter"
+          <Form.Select
+            options={[
+              { key: "all-type", text: "Booking Type", value: "" },
+              ...bookingTypes.map((type) => ({
+                key: type,
+                text: getDisplayBookingType(type),
+                value: type,
+              })),
+            ]}
             value={bookingTypeFilter}
-            onChange={(event) => setBookingTypeFilter(event.target.value)}
-          >
-            <option value="">Booking Type</option>
-            {bookingTypes.map((type) => (
-              <option key={type} value={type}>
-                {type}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <label className="search-field" htmlFor="status-filter">
-          <span className="sr-only">Status Filter</span>
-          <select
-            className="filter-control"
-            id="status-filter"
+            onChange={(_, data) => setBookingTypeFilter(data.value)}
+          />
+          <Form.Select
+            options={[
+              { key: "all-status", text: "Status", value: "" },
+              ...statusOptions.map((status) => ({
+                key: status,
+                text: status,
+                value: status,
+              })),
+            ]}
             value={statusFilter}
-            onChange={(event) => setStatusFilter(event.target.value)}
-          >
-            <option value="">Status</option>
-            {statusOptions.map((status) => (
-              <option key={status} value={status}>
-                {status}
-              </option>
-            ))}
-          </select>
-        </label>
-        </div>
-      </section>
+            onChange={(_, data) => setStatusFilter(data.value)}
+          />
+        </Form.Group>
+      </Form>
 
       {filteredRequests.length > 0 ? (
-        <div className="table-shell">
-          <table className="booking-table">
-            <thead>
-              <tr>
-                <th>Booking ID</th>
-                <th>Name of Applicant</th>
-                <th>Booking Type</th>
-                <th>Purpose</th>
-                <th>No of Guest</th>
-                <th>Start Date</th>
-                <th>End Date</th>
-                <th>Room</th>
-                <th>Booking Status</th>
-              </tr>
-            </thead>
-            <tbody>
+        <div className="semantic-table-wrap">
+          <Table celled selectable compact="very" striped>
+            <Table.Header>
+              <Table.Row>
+                <Table.HeaderCell>Booking ID</Table.HeaderCell>
+                <Table.HeaderCell>Name of Applicant</Table.HeaderCell>
+                <Table.HeaderCell>Booking Type</Table.HeaderCell>
+                <Table.HeaderCell>Purpose</Table.HeaderCell>
+                <Table.HeaderCell>No of Guest</Table.HeaderCell>
+                <Table.HeaderCell>Start Date</Table.HeaderCell>
+                <Table.HeaderCell>End Date</Table.HeaderCell>
+                <Table.HeaderCell>Room</Table.HeaderCell>
+                <Table.HeaderCell>Booking Status</Table.HeaderCell>
+              </Table.Row>
+            </Table.Header>
+            <Table.Body>
               {filteredRequests.map((request) => (
-                <tr
-                  className="booking-table-row"
+                <Table.Row
                   key={request.requestId}
                   onClick={() => setSelectedRequestId(request.requestId)}
                 >
-                  <td>{request.requestId}</td>
-                  <td>{request.applicantName}</td>
-                  <td>{request.bookingType}</td>
-                  <td>{request.purpose}</td>
-                  <td>{request.numberOfGuests}</td>
-                  <td>{getDisplayCheckIn(request)}</td>
-                  <td>{getDisplayCheckOut(request)}</td>
-                  <td>{getAssignedRoomLabel(request)}</td>
-                  <td>
-                    <span
-                      className={`status-chip status-${request.status
-                        .toLowerCase()
-                        .replace(/\s+/g, "-")}`}
-                    >
+                  <Table.Cell>{request.requestId}</Table.Cell>
+                  <Table.Cell>{request.applicantName}</Table.Cell>
+                  <Table.Cell>
+                    {getDisplayBookingType(request.bookingType)}
+                  </Table.Cell>
+                  <Table.Cell>{request.purpose}</Table.Cell>
+                  <Table.Cell>{request.numberOfGuests}</Table.Cell>
+                  <Table.Cell>{getDisplayCheckIn(request)}</Table.Cell>
+                  <Table.Cell>{getDisplayCheckOut(request)}</Table.Cell>
+                  <Table.Cell>{getAssignedRoomLabel(request)}</Table.Cell>
+                  <Table.Cell>
+                    <Label color={getStatusColor(request.status)} size="small">
                       {request.status}
-                    </span>
-                  </td>
-                </tr>
+                    </Label>
+                  </Table.Cell>
+                </Table.Row>
               ))}
-            </tbody>
-          </table>
+            </Table.Body>
+          </Table>
         </div>
       ) : (
-        <article className="card empty-state">
-          <h3>No matching requests</h3>
+        <Message info>
+          <Message.Header>No matching requests</Message.Header>
           <p>Try a different booking ID, type, or status filter.</p>
-        </article>
+        </Message>
       )}
-    </section>
+    </Segment>
   );
 }
 
