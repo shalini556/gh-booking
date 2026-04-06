@@ -93,7 +93,8 @@ function BookingList({ guestHouse }) {
             {selectedRequest.requestId}
           </Header>
           <p className="semantic-hero-copy">
-            Filled form details for {selectedRequest.applicantName} are shown below.
+            Filled form details for {selectedRequest.applicantName} are shown
+            below.
           </p>
           <Button onClick={() => setSelectedRequestId("")}>
             Back to Booking Requests

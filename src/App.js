@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import AdminPage from "./components/AdminPage";
 import guestHouseData from "./data/guestHouseData.json";
+import logo from "./resources/logo.png";
 import {
   allotRooms,
   rejectRoomAllotment,
@@ -162,10 +163,57 @@ function App() {
   };
 
   return (
-    <AdminPage
-      bookingData={bookingData}
-      onUpdateRequest={handleUpdateRequest}
-    />
+    <div className="app-shell">
+      <header className="app-top-header">
+        <div className="app-top-header__inner">
+          <div className="app-top-header__brand">
+            <img
+              alt="Central University Guest House Booking Portal"
+              className="app-top-header__logo"
+              src={logo}
+            />
+            <div className="app-top-header__text">
+              <span className="app-top-header__title">
+                University Accomodation Portal
+              </span>
+            </div>
+          </div>
+
+          <nav aria-label="Primary" className="app-top-header__nav">
+            <a className="app-top-header__nav-link" href="#portal-overview">
+              Overview
+            </a>
+            <a className="app-top-header__nav-link" href="#booking-requests">
+              Requests
+            </a>
+            <a className="app-top-header__nav-link" href="#room-allotment">
+              Allotment
+            </a>
+          </nav>
+
+          <a className="app-top-header__cta" href="#booking-requests">
+            Book Now
+          </a>
+        </div>
+      </header>
+
+      <main className="app-main">
+        <AdminPage
+          bookingData={bookingData}
+          onUpdateRequest={handleUpdateRequest}
+        />
+      </main>
+
+      {/* <footer className="app-footer">
+        <div className="app-footer__inner">
+          <p>Central University Guest House Booking Portal</p>
+          <p>
+            Compact accommodation request management for university staff and
+            guests.
+          </p>
+        </div>
+      </footer> */}
+    </div>
   );
 }
 
