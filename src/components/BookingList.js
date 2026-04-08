@@ -1,8 +1,8 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Button,
-  Form,
   Header,
+  Icon,
   Label,
   Message,
   Segment,
@@ -15,6 +15,7 @@ function BookingList({ guestHouse }) {
   const [bookingTypeFilter, setBookingTypeFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [selectedRequestId, setSelectedRequestId] = useState("");
+  const [openFilterMenu, setOpenFilterMenu] = useState("");
 
   const getDisplayCheckIn = (request) =>
     request.status === "Approved"
@@ -55,15 +56,54 @@ function BookingList({ guestHouse }) {
 
   const requests = guestHouse.requests;
 
+  const buildFilterOptions = (values, formatter) => [
+    { key: "all", text: "All", value: "" },
+    ...[...new Set(values)]
+      .filter((value) => value !== undefined && value !== null && value !== "")
+      .map((value) => ({
+        key: String(value),
+        text: formatter ? formatter(value) : String(value),
+        value: String(value),
+      })),
+  ];
+
+  const bookingIdOptions = useMemo(
+    () => buildFilterOptions(requests.map((request) => request.requestId)),
+    [requests],
+  );
+
   const bookingTypes = useMemo(
-    () => [...new Set(requests.map((request) => request.bookingType))],
+    () =>
+      buildFilterOptions(
+        requests.map((request) => request.bookingType),
+        getDisplayBookingType,
+      ),
     [requests],
   );
 
   const statusOptions = useMemo(
-    () => [...new Set(requests.map((request) => request.status))],
+    () => buildFilterOptions(requests.map((request) => request.status)),
     [requests],
   );
+
+  useEffect(() => {
+    const handleOutsideClick = (event) => {
+      const target = event.target;
+
+      if (
+        target instanceof Element &&
+        !target.closest(".semantic-chip-filter")
+      ) {
+        setOpenFilterMenu("");
+      }
+    };
+
+    document.addEventListener("mousedown", handleOutsideClick);
+
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+    };
+  }, []);
 
   const filteredRequests = useMemo(() => {
     const normalizedBookingId = bookingIdFilter.trim().toLowerCase();
@@ -83,6 +123,34 @@ function BookingList({ guestHouse }) {
       null,
     [requests, selectedRequestId],
   );
+
+  const filterChips = [
+    {
+      key: "bookingId",
+      label: "Booking ID",
+      value: bookingIdFilter,
+      options: bookingIdOptions,
+      onChange: setBookingIdFilter,
+    },
+    {
+      key: "bookingType",
+      label: "Booking Type",
+      value: bookingTypeFilter,
+      options: bookingTypes,
+      onChange: setBookingTypeFilter,
+    },
+    {
+      key: "status",
+      label: "Status",
+      value: statusFilter,
+      options: statusOptions,
+      onChange: setStatusFilter,
+    },
+  ];
+
+  const getFilterLabel = (filterConfig) =>
+    filterConfig.options.find((option) => option.value === filterConfig.value)
+      ?.text || filterConfig.label;
 
   if (selectedRequest) {
     return (
@@ -112,45 +180,93 @@ function BookingList({ guestHouse }) {
         Booking Requests {guestHouse.name}
       </Header>
 
-      <Form className="semantic-filter-form">
-        <Form.Group widths="equal">
-          <Form.Input
-            icon="search"
-            iconPosition="left"
-            placeholder="Search booking ID"
-            value={bookingIdFilter}
-            onChange={(event) => setBookingIdFilter(event.target.value)}
-          />
-          <Form.Select
-            options={[
-              { key: "all-type", text: "Booking Type", value: "" },
-              ...bookingTypes.map((type) => ({
-                key: type,
-                text: getDisplayBookingType(type),
-                value: type,
-              })),
-            ]}
-            value={bookingTypeFilter}
-            onChange={(_, data) => setBookingTypeFilter(data.value)}
-          />
-          <Form.Select
-            options={[
-              { key: "all-status", text: "Status", value: "" },
-              ...statusOptions.map((status) => ({
-                key: status,
-                text: status,
-                value: status,
-              })),
-            ]}
-            value={statusFilter}
-            onChange={(_, data) => setStatusFilter(data.value)}
-          />
-        </Form.Group>
-      </Form>
+      <div className="semantic-filter-toolbar">
+        <div
+          className="semantic-filter-chip-row"
+          role="toolbar"
+          aria-label="Booking filters"
+        >
+          {filterChips.map((filterConfig) => (
+            <div
+              className="semantic-chip-filter semantic-column-filter-shell"
+              key={filterConfig.key}
+            >
+              <button
+                aria-expanded={openFilterMenu === filterConfig.key}
+                aria-haspopup="menu"
+                className={`semantic-filter-chip-button ${
+                  filterConfig.value ? "semantic-filter-chip-button-active" : ""
+                }`}
+                onClick={() =>
+                  setOpenFilterMenu((currentMenu) =>
+                    currentMenu === filterConfig.key ? "" : filterConfig.key,
+                  )
+                }
+                type="button"
+              >
+                <span>{getFilterLabel(filterConfig)}</span>
+                <Icon
+                  name={
+                    openFilterMenu === filterConfig.key
+                      ? "angle up"
+                      : "angle down"
+                  }
+                />
+              </button>
+
+              {openFilterMenu === filterConfig.key ? (
+                <div
+                  className="semantic-column-filter-menu semantic-chip-filter-menu"
+                  onClick={(event) => event.stopPropagation()}
+                  role="menu"
+                >
+                  {filterConfig.options.map((option) => (
+                    <button
+                      className={`semantic-column-filter-item ${
+                        filterConfig.value === option.value
+                          ? "semantic-column-filter-item-active"
+                          : ""
+                      }`}
+                      key={`${filterConfig.key}-${option.value || "all"}`}
+                      onClick={() => {
+                        filterConfig.onChange(option.value);
+                        setOpenFilterMenu("");
+                      }}
+                      type="button"
+                    >
+                      {option.text}
+                    </button>
+                  ))}
+                </div>
+              ) : null}
+            </div>
+          ))}
+
+          <button
+            className="semantic-filter-chip-button semantic-filter-chip-button-muted"
+            onClick={() => {
+              setBookingIdFilter("");
+              setBookingTypeFilter("");
+              setStatusFilter("");
+              setOpenFilterMenu("");
+            }}
+            type="button"
+          >
+            <span>Clear Filters</span>
+            <Icon name="close" />
+          </button>
+        </div>
+      </div>
 
       {filteredRequests.length > 0 ? (
         <div className="semantic-table-wrap">
-          <Table celled selectable compact="very" striped>
+          <Table
+            celled
+            className="semantic-booking-table"
+            selectable
+            compact="very"
+            striped
+          >
             <Table.Header>
               <Table.Row>
                 <Table.HeaderCell>Booking ID</Table.HeaderCell>

@@ -8,24 +8,15 @@ import {
   Label,
   Message,
   Modal,
+  Pagination,
   Segment,
   Table,
 } from "semantic-ui-react";
 import { getAvailableRooms } from "../utils/roomAllotment";
 
 function AdminPage({ bookingData, onUpdateRequest }) {
+  const rowsPerPage = 10;
   const [selectedGuestHouseName, setSelectedGuestHouseName] = useState("");
-  const [bookingIdFilter, setBookingIdFilter] = useState("");
-  const [applicantFilter, setApplicantFilter] = useState("");
-  const [guestHouseNameFilter, setGuestHouseNameFilter] = useState("");
-  const [bookingTypeFilter, setBookingTypeFilter] = useState("");
-  const [guestCountFilter, setGuestCountFilter] = useState("");
-  const [checkInFilter, setCheckInFilter] = useState("");
-  const [checkOutFilter, setCheckOutFilter] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
-  const [openColumnMenu, setOpenColumnMenu] = useState("");
-  const [sortColumn, setSortColumn] = useState("");
-  const [sortDirection, setSortDirection] = useState("ascending");
   const [adminError, setAdminError] = useState("");
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [confirmationNotice, setConfirmationNotice] = useState(null);
@@ -33,6 +24,7 @@ function AdminPage({ bookingData, onUpdateRequest }) {
   const [selectedRooms, setSelectedRooms] = useState([]);
   const [allotmentCheckIn, setAllotmentCheckIn] = useState("");
   const [allotmentCheckOut, setAllotmentCheckOut] = useState("");
+  const [activePage, setActivePage] = useState(1);
 
   const getDisplayCheckIn = (request) =>
     request.status === "Approved"
@@ -93,146 +85,14 @@ function AdminPage({ bookingData, onUpdateRequest }) {
     [selectedGuestHouseFilter],
   );
 
-  const buildFilterOptions = (values, formatter) => [
-    { key: "all", text: "All", value: "" },
-    ...[...new Set(values)]
-      .filter((value) => value !== undefined && value !== null && value !== "")
-      .map((value) => ({
-        key: String(value),
-        text: formatter ? formatter(value) : String(value),
-        value: String(value),
-      })),
-  ];
+  const filteredRequests = allRequests;
 
-  const bookingIdOptions = useMemo(
-    () => buildFilterOptions(allRequests.map((request) => request.requestId)),
-    [allRequests],
-  );
+  const totalPages = Math.max(1, Math.ceil(filteredRequests.length / rowsPerPage));
 
-  const applicantOptions = useMemo(
-    () =>
-      buildFilterOptions(allRequests.map((request) => request.applicantName)),
-    [allRequests],
-  );
-
-  const guestHouseOptions = useMemo(
-    () =>
-      buildFilterOptions(allRequests.map((request) => request.guestHouseName)),
-    [allRequests],
-  );
-
-  const bookingTypeOptions = useMemo(
-    () =>
-      buildFilterOptions(
-        allRequests.map((request) => request.bookingType),
-        getDisplayBookingType,
-      ),
-    [allRequests],
-  );
-
-  const guestCountOptions = useMemo(
-    () =>
-      buildFilterOptions(allRequests.map((request) => request.numberOfGuests)),
-    [allRequests],
-  );
-
-  const checkInOptions = useMemo(
-    () =>
-      buildFilterOptions(
-        allRequests.map((request) => getDisplayCheckIn(request)),
-      ),
-    [allRequests],
-  );
-
-  const checkOutOptions = useMemo(
-    () =>
-      buildFilterOptions(
-        allRequests.map((request) => getDisplayCheckOut(request)),
-      ),
-    [allRequests],
-  );
-
-  const statusOptions = useMemo(
-    () => buildFilterOptions(allRequests.map((request) => request.status)),
-    [allRequests],
-  );
-
-  const filteredRequests = useMemo(() => {
-    return allRequests.filter((request) => {
-      return (
-        (!bookingIdFilter || request.requestId === bookingIdFilter) &&
-        (!applicantFilter || request.applicantName === applicantFilter) &&
-        (!guestHouseNameFilter ||
-          request.guestHouseName === guestHouseNameFilter) &&
-        (!bookingTypeFilter || request.bookingType === bookingTypeFilter) &&
-        (!guestCountFilter ||
-          String(request.numberOfGuests) === guestCountFilter) &&
-        (!checkInFilter || getDisplayCheckIn(request) === checkInFilter) &&
-        (!checkOutFilter || getDisplayCheckOut(request) === checkOutFilter) &&
-        (!statusFilter || request.status === statusFilter)
-      );
-    });
-  }, [
-    allRequests,
-    applicantFilter,
-    bookingIdFilter,
-    bookingTypeFilter,
-    checkInFilter,
-    checkOutFilter,
-    guestCountFilter,
-    guestHouseNameFilter,
-    statusFilter,
-  ]);
-
-  const displayRequests = useMemo(() => {
-    if (!sortColumn) {
-      return filteredRequests;
-    }
-
-    const directionFactor = sortDirection === "ascending" ? 1 : -1;
-    const nextRequests = [...filteredRequests];
-
-    const getSortValue = (request) => {
-      switch (sortColumn) {
-        case "requestId":
-          return request.requestId || "";
-        case "applicantName":
-          return request.applicantName || "";
-        case "guestHouseName":
-          return request.guestHouseName || "";
-        case "bookingType":
-          return getDisplayBookingType(request.bookingType || "");
-        case "numberOfGuests":
-          return Number(request.numberOfGuests) || 0;
-        case "checkIn":
-          return getDisplayCheckIn(request) || "";
-        case "checkOut":
-          return getDisplayCheckOut(request) || "";
-        case "status":
-          return request.status || "";
-        default:
-          return "";
-      }
-    };
-
-    nextRequests.sort((firstRequest, secondRequest) => {
-      const firstValue = getSortValue(firstRequest);
-      const secondValue = getSortValue(secondRequest);
-
-      if (typeof firstValue === "number" && typeof secondValue === "number") {
-        return (firstValue - secondValue) * directionFactor;
-      }
-
-      return (
-        String(firstValue).localeCompare(String(secondValue), undefined, {
-          numeric: true,
-          sensitivity: "base",
-        }) * directionFactor
-      );
-    });
-
-    return nextRequests;
-  }, [filteredRequests, sortColumn, sortDirection]);
+  const paginatedRequests = useMemo(() => {
+    const startIndex = (activePage - 1) * rowsPerPage;
+    return filteredRequests.slice(startIndex, startIndex + rowsPerPage);
+  }, [activePage, filteredRequests]);
 
   const selectedRequest = useMemo(
     () =>
@@ -277,6 +137,16 @@ function AdminPage({ bookingData, onUpdateRequest }) {
   }, [allRequests, selectedRequestId]);
 
   useEffect(() => {
+    setActivePage(1);
+  }, [selectedGuestHouseName]);
+
+  useEffect(() => {
+    if (activePage > totalPages) {
+      setActivePage(totalPages);
+    }
+  }, [activePage, totalPages]);
+
+  useEffect(() => {
     setSelectedRooms(
       selectedRequest?.assignedRooms?.length
         ? selectedRequest.assignedRooms
@@ -293,179 +163,11 @@ function AdminPage({ bookingData, onUpdateRequest }) {
     setAdminError("");
   }, [selectedRequest]);
 
-  useEffect(() => {
-    const handleOutsideClick = (event) => {
-      const target = event.target;
-
-      if (
-        target instanceof Element &&
-        !target.closest(".semantic-column-filter-shell")
-      ) {
-        setOpenColumnMenu("");
-      }
-    };
-
-    document.addEventListener("mousedown", handleOutsideClick);
-
-    return () => {
-      document.removeEventListener("mousedown", handleOutsideClick);
-    };
-  }, []);
-
   const toggleRoomSelection = (roomNumber) => {
     setSelectedRooms((currentRooms) =>
       currentRooms.includes(roomNumber)
         ? currentRooms.filter((item) => item !== roomNumber)
         : [...currentRooms, roomNumber],
-    );
-  };
-
-  const columnMenus = {
-    requestId: {
-      label: "Booking ID",
-      options: bookingIdOptions,
-      value: bookingIdFilter,
-      onFilterChange: setBookingIdFilter,
-    },
-    applicantName: {
-      label: "Applicant",
-      options: applicantOptions,
-      value: applicantFilter,
-      onFilterChange: setApplicantFilter,
-    },
-    guestHouseName: {
-      label: "Guest House Name",
-      options: guestHouseOptions,
-      value: guestHouseNameFilter,
-      onFilterChange: setGuestHouseNameFilter,
-    },
-    bookingType: {
-      label: "Type",
-      options: bookingTypeOptions,
-      value: bookingTypeFilter,
-      onFilterChange: setBookingTypeFilter,
-    },
-    numberOfGuests: {
-      label: "No. of Guests",
-      options: guestCountOptions,
-      value: guestCountFilter,
-      onFilterChange: setGuestCountFilter,
-    },
-    checkIn: {
-      label: "Start Date",
-      options: checkInOptions,
-      value: checkInFilter,
-      onFilterChange: setCheckInFilter,
-    },
-    checkOut: {
-      label: "End Date",
-      options: checkOutOptions,
-      value: checkOutFilter,
-      onFilterChange: setCheckOutFilter,
-    },
-    status: {
-      label: "Status",
-      options: statusOptions,
-      value: statusFilter,
-      onFilterChange: setStatusFilter,
-    },
-  };
-
-  const renderColumnHeader = (columnKey) => {
-    const columnConfig = columnMenus[columnKey];
-
-    return (
-      <div className="semantic-column-header semantic-column-filter-shell">
-        <span>{columnConfig.label}</span>
-        <button
-          aria-expanded={openColumnMenu === columnKey}
-          aria-haspopup="menu"
-          aria-label={`${columnConfig.label} filter options`}
-          className="semantic-column-trigger"
-          onClick={(event) => {
-            event.stopPropagation();
-            setOpenColumnMenu((currentColumn) =>
-              currentColumn === columnKey ? "" : columnKey,
-            );
-          }}
-          type="button"
-        >
-          <Icon name="dropdown" />
-        </button>
-        {openColumnMenu === columnKey ? (
-          <div
-            className="semantic-column-filter-menu"
-            onClick={(event) => event.stopPropagation()}
-            role="menu"
-          >
-            <button
-              className={`semantic-column-filter-item ${
-                sortColumn === columnKey && sortDirection === "ascending"
-                  ? "semantic-column-filter-item-active"
-                  : ""
-              }`}
-              onClick={() => {
-                setSortColumn(columnKey);
-                setSortDirection("ascending");
-                setOpenColumnMenu("");
-              }}
-              type="button"
-            >
-              Sort Ascending
-            </button>
-            <button
-              className={`semantic-column-filter-item ${
-                sortColumn === columnKey && sortDirection === "descending"
-                  ? "semantic-column-filter-item-active"
-                  : ""
-              }`}
-              onClick={() => {
-                setSortColumn(columnKey);
-                setSortDirection("descending");
-                setOpenColumnMenu("");
-              }}
-              type="button"
-            >
-              Sort Descending
-            </button>
-            <button
-              className={`semantic-column-filter-item ${
-                sortColumn !== columnKey
-                  ? "semantic-column-filter-item-active"
-                  : ""
-              }`}
-              onClick={() => {
-                if (sortColumn === columnKey) {
-                  setSortColumn("");
-                  setSortDirection("ascending");
-                }
-                setOpenColumnMenu("");
-              }}
-              type="button"
-            >
-              Clear Sort
-            </button>
-            <div className="semantic-column-filter-divider" />
-            {columnConfig.options.map((option) => (
-              <button
-                className={`semantic-column-filter-item ${
-                  columnConfig.value === option.value
-                    ? "semantic-column-filter-item-active"
-                    : ""
-                }`}
-                key={`${columnKey}-${option.value || "all"}`}
-                onClick={() => {
-                  columnConfig.onFilterChange(option.value);
-                  setOpenColumnMenu("");
-                }}
-                type="button"
-              >
-                {option.text}
-              </button>
-            ))}
-          </div>
-        ) : null}
-      </div>
     );
   };
 
@@ -495,12 +197,19 @@ function AdminPage({ bookingData, onUpdateRequest }) {
 
   const selectedRequestDetails = selectedRequest
     ? [
-        { label: "Guest Name", value: selectedRequest.applicantName },
+        { label: "Applicant Name", value: selectedRequest.applicantName },
+        { label: "Visitor Name", value: selectedRequest.guestName },
+        { label: "Visitor Designation", value: selectedRequest.guestDesignation },
+        { label: "Visitor Organization", value: selectedRequest.guestOrganization },
+        { label: "Visitor Mobile", value: selectedRequest.guestMobileNumber },
+        { label: "Visitor Address", value: selectedRequest.guestAddress },
         { label: "Employee ID", value: selectedRequest.employeeId },
         { label: "Designation", value: selectedRequest.designation },
         { label: "Department", value: selectedRequest.department },
         { label: "Email", value: selectedRequest.email },
         { label: "Mobile", value: selectedRequest.phone },
+        { label: "Purpose", value: selectedRequest.purpose },
+        { label: "Submitted On", value: selectedRequest.submittedOn },
         {
           label: "Booking Type",
           value: getDisplayBookingType(selectedRequest.bookingType),
@@ -621,77 +330,79 @@ function AdminPage({ bookingData, onUpdateRequest }) {
                 <div className="semantic-table-empty-state" role="status">
                   <p>Select any guest house to view the request details.</p>
                 </div>
-              ) : displayRequests.length ? (
-                <div className="semantic-table-wrap">
-                  <Table
-                    celled
-                    className="semantic-booking-table"
-                    selectable
-                    compact="very"
-                    striped
-                  >
-                    <Table.Header>
-                      <Table.Row>
-                        <Table.HeaderCell>
-                          {renderColumnHeader("requestId")}
-                        </Table.HeaderCell>
-                        <Table.HeaderCell>
-                          {renderColumnHeader("applicantName")}
-                        </Table.HeaderCell>
-                        <Table.HeaderCell>
-                          {renderColumnHeader("guestHouseName")}
-                        </Table.HeaderCell>
-                        <Table.HeaderCell>
-                          {renderColumnHeader("bookingType")}
-                        </Table.HeaderCell>
-                        <Table.HeaderCell>
-                          {renderColumnHeader("numberOfGuests")}
-                        </Table.HeaderCell>
-                        <Table.HeaderCell>
-                          {renderColumnHeader("checkIn")}
-                        </Table.HeaderCell>
-                        <Table.HeaderCell>
-                          {renderColumnHeader("checkOut")}
-                        </Table.HeaderCell>
-                        <Table.HeaderCell>Room No</Table.HeaderCell>
-                        <Table.HeaderCell>
-                          {renderColumnHeader("status")}
-                        </Table.HeaderCell>
-                      </Table.Row>
-                    </Table.Header>
-                    <Table.Body>
-                      {displayRequests.map((request) => (
-                        <Table.Row
-                          active={selectedRequestId === request.requestId}
-                          key={request.requestId}
-                          onClick={() => {
-                            setSelectedRequestId(request.requestId);
-                            setIsDetailModalOpen(true);
-                          }}
-                        >
-                          <Table.Cell>{request.requestId}</Table.Cell>
-                          <Table.Cell>{request.applicantName}</Table.Cell>
-                          <Table.Cell>{request.guestHouseName}</Table.Cell>
-                          <Table.Cell>
-                            {getDisplayBookingType(request.bookingType)}
-                          </Table.Cell>
-                          <Table.Cell>{request.numberOfGuests}</Table.Cell>
-                          <Table.Cell>{getDisplayCheckIn(request)}</Table.Cell>
-                          <Table.Cell>{getDisplayCheckOut(request)}</Table.Cell>
-                          <Table.Cell>{getAssignedRoomLabel(request)}</Table.Cell>
-                          <Table.Cell>
-                            <Label
-                              color={getStatusColor(request.status)}
-                              size="small"
-                            >
-                              {request.status}
-                            </Label>
-                          </Table.Cell>
+              ) : filteredRequests.length ? (
+                <>
+                  <div className="semantic-table-wrap">
+                    <Table
+                      celled
+                      className="semantic-booking-table"
+                      selectable
+                      compact="very"
+                      striped
+                    >
+                      <Table.Header>
+                        <Table.Row>
+                          <Table.HeaderCell>Booking ID</Table.HeaderCell>
+                          <Table.HeaderCell>Applicant</Table.HeaderCell>
+                          <Table.HeaderCell>Guest House Name</Table.HeaderCell>
+                          <Table.HeaderCell>Type</Table.HeaderCell>
+                          <Table.HeaderCell>No. of Guests</Table.HeaderCell>
+                          <Table.HeaderCell>Start Date</Table.HeaderCell>
+                          <Table.HeaderCell>End Date</Table.HeaderCell>
+                          <Table.HeaderCell>Room No</Table.HeaderCell>
+                          <Table.HeaderCell>Status</Table.HeaderCell>
                         </Table.Row>
-                      ))}
-                    </Table.Body>
-                  </Table>
-                </div>
+                      </Table.Header>
+                      <Table.Body>
+                        {paginatedRequests.map((request) => (
+                          <Table.Row
+                            active={selectedRequestId === request.requestId}
+                            key={request.requestId}
+                            onClick={() => {
+                              setSelectedRequestId(request.requestId);
+                              setIsDetailModalOpen(true);
+                            }}
+                          >
+                            <Table.Cell>{request.requestId}</Table.Cell>
+                            <Table.Cell>{request.applicantName}</Table.Cell>
+                            <Table.Cell>{request.guestHouseName}</Table.Cell>
+                            <Table.Cell>
+                              {getDisplayBookingType(request.bookingType)}
+                            </Table.Cell>
+                            <Table.Cell>{request.numberOfGuests}</Table.Cell>
+                            <Table.Cell>{getDisplayCheckIn(request)}</Table.Cell>
+                            <Table.Cell>{getDisplayCheckOut(request)}</Table.Cell>
+                            <Table.Cell>{getAssignedRoomLabel(request)}</Table.Cell>
+                            <Table.Cell>
+                              <Label
+                                color={getStatusColor(request.status)}
+                                size="small"
+                              >
+                                {request.status}
+                              </Label>
+                            </Table.Cell>
+                          </Table.Row>
+                        ))}
+                      </Table.Body>
+                    </Table>
+                  </div>
+                  {filteredRequests.length > rowsPerPage ? (
+                    <div className="semantic-table-pagination">
+                      <Pagination
+                        activePage={activePage}
+                        boundaryRange={0}
+                        ellipsisItem={null}
+                        firstItem={null}
+                        lastItem={null}
+                        onPageChange={(_, data) =>
+                          setActivePage(Number(data.activePage) || 1)
+                        }
+                        siblingRange={1}
+                        totalPages={totalPages}
+                      />
+                    </div>
+                  ) : null}
+                </>
               ) : (
                 <Message info>
                   <Message.Header>No matching requests</Message.Header>

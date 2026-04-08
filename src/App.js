@@ -9,7 +9,7 @@ import {
 } from "./utils/roomAllotment";
 import "./App.css";
 
-const BOOKING_DATA_STORAGE_KEY = "booking-project1-admin-data";
+const BOOKING_DATA_STORAGE_KEY = "booking-project1-admin-data-v2";
 
 function App() {
   const [bookingData, setBookingData] = useState(() => {

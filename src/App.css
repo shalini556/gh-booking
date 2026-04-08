@@ -492,11 +492,83 @@
   border-color: rgba(45, 125, 104, 0.45);
 }
 
+.semantic-filter-toolbar {
+  margin-bottom: 14px;
+}
+
+.semantic-filter-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.semantic-chip-filter {
+  position: relative;
+}
+
+.semantic-filter-chip-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid var(--portal-border);
+  border-radius: 14px;
+  background: #ffffff;
+  color: var(--portal-text);
+  font-size: 0.95rem;
+  font-weight: 500;
+  box-shadow: var(--portal-shadow-soft);
+  cursor: pointer;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    background-color 160ms ease,
+    color 160ms ease;
+}
+
+.semantic-filter-chip-button:hover,
+.semantic-filter-chip-button:focus-visible {
+  border-color: var(--portal-border-strong);
+  background: #f9fcfb;
+}
+
+.semantic-filter-chip-button .icon {
+  margin: 0;
+  color: var(--portal-text-soft);
+}
+
+.semantic-filter-chip-button-active {
+  border-color: rgba(45, 125, 104, 0.34);
+  background: var(--portal-green-soft);
+  color: var(--portal-navy);
+}
+
+.semantic-filter-chip-button-active .icon {
+  color: var(--portal-green);
+}
+
+.semantic-filter-chip-button-muted {
+  background: #f7faf9;
+  color: var(--portal-text-soft);
+}
+
+.semantic-chip-filter-menu {
+  top: calc(100% + 8px);
+  left: 0;
+  right: auto;
+  width: 210px;
+  min-width: 210px;
+  border-radius: 16px;
+  padding: 8px;
+}
+
 .semantic-table-wrap {
   overflow-x: auto;
   overflow-y: visible;
   border: 1px solid var(--portal-border);
-  border-radius: 18px;
+  border-radius: 0px;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
   position: relative;
 }
@@ -549,7 +621,7 @@
 .semantic-column-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   gap: 8px;
   position: relative;
 }
@@ -558,8 +630,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   padding: 0;
   border: 0;
   background: transparent;
@@ -1012,18 +1084,20 @@
 }
 
 .semantic-table-wrap .ui.table.semantic-booking-table {
-  min-width: 600px;
-  table-layout: auto;
+  min-width: 860px;
+  table-layout: fixed;
 }
 
 .semantic-table-wrap .ui.table.semantic-booking-table thead th,
 .semantic-table-wrap .ui.table.semantic-booking-table tbody td {
-  padding: 8px 8px;
-  font-size: 0.8rem;
+  padding: 8px 10px;
+  font-size: 0.92rem;
 }
 
 .semantic-table-wrap .ui.table.semantic-booking-table thead th {
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .semantic-table-wrap .ui.table.semantic-booking-table tbody td {
@@ -1034,42 +1108,60 @@
 
 .semantic-table-wrap .ui.table.semantic-booking-table thead th:nth-child(1),
 .semantic-table-wrap .ui.table.semantic-booking-table tbody td:nth-child(1) {
-  width: 72px;
+  width: 48px;
 }
 
 .semantic-table-wrap .ui.table.semantic-booking-table thead th:nth-child(2),
 .semantic-table-wrap .ui.table.semantic-booking-table tbody td:nth-child(2) {
-  width: 104px;
+  width: 110px;
 }
 
 .semantic-table-wrap .ui.table.semantic-booking-table thead th:nth-child(3),
 .semantic-table-wrap .ui.table.semantic-booking-table tbody td:nth-child(3) {
-  width: 118px;
+  width: 100px;
 }
 
 .semantic-table-wrap .ui.table.semantic-booking-table thead th:nth-child(4),
 .semantic-table-wrap .ui.table.semantic-booking-table tbody td:nth-child(4) {
-  width: 76px;
+  width: 48px;
 }
 
 .semantic-table-wrap .ui.table.semantic-booking-table thead th:nth-child(5),
 .semantic-table-wrap .ui.table.semantic-booking-table tbody td:nth-child(5) {
-  width: 72px;
+  width: 60px;
 }
 
 .semantic-table-wrap .ui.table.semantic-booking-table thead th:nth-child(6),
 .semantic-table-wrap .ui.table.semantic-booking-table tbody td:nth-child(6),
 .semantic-table-wrap .ui.table.semantic-booking-table thead th:nth-child(7),
 .semantic-table-wrap .ui.table.semantic-booking-table tbody td:nth-child(7) {
-  width: 92px;
+  width: 60px;
 }
 
 .semantic-table-wrap .ui.table.semantic-booking-table thead th:nth-child(8),
 .semantic-table-wrap .ui.table.semantic-booking-table tbody td:nth-child(8) {
-  width: 76px;
+  width: 55px;
 }
 
 .semantic-table-wrap .ui.table.semantic-booking-table thead th:nth-child(9),
 .semantic-table-wrap .ui.table.semantic-booking-table tbody td:nth-child(9) {
-  width: 84px;
+  width: 45px;
+}
+
+.semantic-table-pagination {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+
+.semantic-table-pagination .ui.pagination.menu {
+  box-shadow: none;
+  border-radius: 999px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  overflow: hidden;
+}
+
+.semantic-table-pagination .ui.pagination.menu .item {
+  min-width: 42px;
+  justify-content: center;
 }
