@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Button,
+  Checkbox,
   Container,
   Form,
   Header,
@@ -25,6 +26,29 @@ function AdminPage({ bookingData, onUpdateRequest }) {
   const [allotmentCheckIn, setAllotmentCheckIn] = useState("");
   const [allotmentCheckOut, setAllotmentCheckOut] = useState("");
   const [activePage, setActivePage] = useState(1);
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
+
+  // Start Date filter state
+  const [startDateFrom, setStartDateFrom] = useState("");
+  const [startDateTo, setStartDateTo] = useState("");
+  const [showStartDateFilter, setShowStartDateFilter] = useState(false);
+  const startDateFilterRef = useRef(null);
+
+  // End Date filter state
+  const [endDateFrom, setEndDateFrom] = useState("");
+  const [endDateTo, setEndDateTo] = useState("");
+  const [showEndDateFilter, setShowEndDateFilter] = useState(false);
+  const endDateFilterRef = useRef(null);
+
+  // Status filter state
+  const [selectedStatuses, setSelectedStatuses] = useState([]);
+  const [showStatusFilter, setShowStatusFilter] = useState(false);
+  const statusFilterRef = useRef(null);
+
+  // Type filter state
+  const [selectedTypes, setSelectedTypes] = useState([]);
+  const [showTypeFilter, setShowTypeFilter] = useState(false);
+  const typeFilterRef = useRef(null);
 
   const getDisplayCheckIn = (request) =>
     request.status === "Approved"
@@ -85,14 +109,172 @@ function AdminPage({ bookingData, onUpdateRequest }) {
     [selectedGuestHouseFilter],
   );
 
-  const filteredRequests = allRequests;
+  // Compute available statuses from data
+  const availableStatuses = useMemo(() => {
+    const statusSet = new Set(allRequests.map((r) => r.status));
+    return Array.from(statusSet).sort();
+  }, [allRequests]);
+
+  // Compute available types from data
+  const availableTypes = useMemo(() => {
+    const typeSet = new Set(allRequests.map((r) => getDisplayBookingType(r.bookingType)));
+    return Array.from(typeSet).sort();
+  }, [allRequests]);
+
+  // Compute available date range from data
+  const dataDateRange = useMemo(() => {
+    let minDate = '';
+    let maxDate = '';
+    allRequests.forEach((r) => {
+      const ci = r.checkIn || '';
+      const co = r.checkOut || '';
+      if (ci && (!minDate || ci < minDate)) minDate = ci;
+      if (co && (!maxDate || co > maxDate)) maxDate = co;
+      if (ci && (!maxDate || ci > maxDate)) maxDate = ci;
+      if (co && (!minDate || co < minDate)) minDate = co;
+    });
+    return { min: minDate, max: maxDate };
+  }, [allRequests]);
+
+  // Filter by status + type + date ranges
+  const filteredRequests = useMemo(() => {
+    let result = allRequests;
+
+    // Status filter
+    if (selectedStatuses.length > 0) {
+      result = result.filter((r) => selectedStatuses.includes(r.status));
+    }
+
+    // Type filter
+    if (selectedTypes.length > 0) {
+      result = result.filter((r) => selectedTypes.includes(getDisplayBookingType(r.bookingType)));
+    }
+
+    // Start Date range filter
+    if (startDateFrom) {
+      result = result.filter((r) => {
+        const ci = getDisplayCheckIn(r);
+        return ci >= startDateFrom;
+      });
+    }
+    if (startDateTo) {
+      result = result.filter((r) => {
+        const ci = getDisplayCheckIn(r);
+        return ci <= startDateTo;
+      });
+    }
+
+    // End Date range filter
+    if (endDateFrom) {
+      result = result.filter((r) => {
+        const co = getDisplayCheckOut(r);
+        return co >= endDateFrom;
+      });
+    }
+    if (endDateTo) {
+      result = result.filter((r) => {
+        const co = getDisplayCheckOut(r);
+        return co <= endDateTo;
+      });
+    }
+
+    return result;
+  }, [allRequests, selectedStatuses, selectedTypes, startDateFrom, startDateTo, endDateFrom, endDateTo]);
+
+  const sortedRequests = useMemo(() => {
+    let sortableItems = [...filteredRequests];
+    if (sortConfig.key) {
+      sortableItems.sort((a, b) => {
+        let aValue = a[sortConfig.key];
+        let bValue = b[sortConfig.key];
+
+        if (sortConfig.key === 'assignedRoom') {
+          aValue = getAssignedRoomLabel(a);
+          bValue = getAssignedRoomLabel(b);
+        } else if (sortConfig.key === 'guestHouseName') {
+          aValue = a.guestHouseName || '';
+          bValue = b.guestHouseName || '';
+        } else if (sortConfig.key === 'bookingType') {
+          aValue = getDisplayBookingType(a.bookingType) || '';
+          bValue = getDisplayBookingType(b.bookingType) || '';
+        } else {
+          aValue = aValue || '';
+          bValue = bValue || '';
+        }
+
+        if (aValue < bValue) {
+          return sortConfig.direction === 'ascending' ? -1 : 1;
+        }
+        if (aValue > bValue) {
+          return sortConfig.direction === 'ascending' ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+    return sortableItems;
+  }, [filteredRequests, sortConfig]);
 
   const totalPages = Math.max(1, Math.ceil(filteredRequests.length / rowsPerPage));
 
   const paginatedRequests = useMemo(() => {
     const startIndex = (activePage - 1) * rowsPerPage;
-    return filteredRequests.slice(startIndex, startIndex + rowsPerPage);
-  }, [activePage, filteredRequests]);
+    return sortedRequests.slice(startIndex, startIndex + rowsPerPage);
+  }, [activePage, sortedRequests]);
+
+  const handleSort = (key) => {
+    let direction = 'ascending';
+    if (sortConfig.key === key && sortConfig.direction === 'ascending') {
+      direction = 'descending';
+    }
+    setSortConfig({ key, direction });
+  };
+
+  // Toggle status checkbox
+  const toggleStatusFilter = (status) => {
+    setSelectedStatuses((prev) =>
+      prev.includes(status)
+        ? prev.filter((s) => s !== status)
+        : [...prev, status],
+    );
+  };
+
+  // Toggle type checkbox
+  const toggleTypeFilter = (type) => {
+    setSelectedTypes((prev) =>
+      prev.includes(type)
+        ? prev.filter((t) => t !== type)
+        : [...prev, type],
+    );
+  };
+
+  // Helper to close all filter dropdowns
+  const closeAllFilters = useCallback(() => {
+    setShowStartDateFilter(false);
+    setShowEndDateFilter(false);
+    setShowStatusFilter(false);
+    setShowTypeFilter(false);
+  }, []);
+
+  // Close dropdowns when clicking outside
+  const handleClickOutside = useCallback((e) => {
+    if (startDateFilterRef.current && !startDateFilterRef.current.contains(e.target)) {
+      setShowStartDateFilter(false);
+    }
+    if (endDateFilterRef.current && !endDateFilterRef.current.contains(e.target)) {
+      setShowEndDateFilter(false);
+    }
+    if (statusFilterRef.current && !statusFilterRef.current.contains(e.target)) {
+      setShowStatusFilter(false);
+    }
+    if (typeFilterRef.current && !typeFilterRef.current.contains(e.target)) {
+      setShowTypeFilter(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [handleClickOutside]);
 
   const selectedRequest = useMemo(
     () =>
@@ -138,7 +320,15 @@ function AdminPage({ bookingData, onUpdateRequest }) {
 
   useEffect(() => {
     setActivePage(1);
-  }, [selectedGuestHouseName]);
+    setStartDateFrom("");
+    setStartDateTo("");
+    setEndDateFrom("");
+    setEndDateTo("");
+    setSelectedStatuses([]);
+    setSelectedTypes([]);
+    setSortConfig({ key: null, direction: null });
+    closeAllFilters();
+  }, [selectedGuestHouseName, closeAllFilters]);
 
   useEffect(() => {
     if (activePage > totalPages) {
@@ -237,7 +427,7 @@ function AdminPage({ bookingData, onUpdateRequest }) {
   return (
     <Container fluid className="page-shell semantic-shell">
       <section className="semantic-dashboard-shell">
-        <div className="semantic-stack">
+        <div className="semantic-dashboard-layout">
           <section id="room-allotment">
             <Segment className="semantic-panel compact-panel">
               <div className="semantic-panel-head semantic-panel-head-compact">
@@ -248,7 +438,7 @@ function AdminPage({ bookingData, onUpdateRequest }) {
                 </div>
               </div>
 
-              <div className="semantic-room-card-grid">
+              <div className="semantic-room-card-list">
                 {bookingData.guestHouses.map((guestHouse) => (
                   <button
                     className={`semantic-room-card ${
@@ -339,18 +529,169 @@ function AdminPage({ bookingData, onUpdateRequest }) {
                       selectable
                       compact="very"
                       striped
+                      sortable
                     >
                       <Table.Header>
                         <Table.Row>
-                          <Table.HeaderCell>Booking ID</Table.HeaderCell>
-                          <Table.HeaderCell>Applicant</Table.HeaderCell>
-                          <Table.HeaderCell>Guest House Name</Table.HeaderCell>
-                          <Table.HeaderCell>Type</Table.HeaderCell>
-                          <Table.HeaderCell>No. of Guests</Table.HeaderCell>
-                          <Table.HeaderCell>Start Date</Table.HeaderCell>
-                          <Table.HeaderCell>End Date</Table.HeaderCell>
-                          <Table.HeaderCell>Room No</Table.HeaderCell>
-                          <Table.HeaderCell>Status</Table.HeaderCell>
+                          <Table.HeaderCell sorted={sortConfig.key === 'requestId' ? sortConfig.direction : null} onClick={() => handleSort('requestId')}>Booking ID</Table.HeaderCell>
+                          <Table.HeaderCell sorted={sortConfig.key === 'applicantName' ? sortConfig.direction : null} onClick={() => handleSort('applicantName')}>Applicant</Table.HeaderCell>
+                          <Table.HeaderCell sorted={sortConfig.key === 'guestHouseName' ? sortConfig.direction : null} onClick={() => handleSort('guestHouseName')}>Guest House Name</Table.HeaderCell>
+
+                          {/* Type filter header */}
+                          <Table.HeaderCell
+                            className="semantic-filter-header"
+                            onClick={(e) => { e.stopPropagation(); closeAllFilters(); setShowTypeFilter((v) => !v); }}
+                          >
+                            <div className="semantic-filter-header-inner" ref={typeFilterRef}>
+                              <span>
+                                Type
+                                <Icon name="filter" size="small" style={{ marginLeft: 4, opacity: selectedTypes.length > 0 ? 1 : 0.4 }} />
+                                {selectedTypes.length > 0 && <span className="semantic-filter-badge" />}
+                              </span>
+                              {showTypeFilter && (
+                                <div className="semantic-header-dropdown semantic-type-dropdown" onClick={(e) => e.stopPropagation()}>
+                                  {availableTypes.map((type) => (
+                                    <div key={type} className="semantic-status-option">
+                                      <Checkbox
+                                        label={type}
+                                        checked={selectedTypes.includes(type)}
+                                        onChange={() => toggleTypeFilter(type)}
+                                      />
+                                    </div>
+                                  ))}
+                                  <div className="semantic-filter-dropdown-divider" />
+                                  <button
+                                    className="semantic-filter-clear-btn"
+                                    type="button"
+                                    onClick={() => setSelectedTypes([])}
+                                  >
+                                    Clear All
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          </Table.HeaderCell>
+
+                          <Table.HeaderCell sorted={sortConfig.key === 'numberOfGuests' ? sortConfig.direction : null} onClick={() => handleSort('numberOfGuests')}>No. of Guests</Table.HeaderCell>
+
+                          {/* Start Date filter header */}
+                          <Table.HeaderCell
+                            className="semantic-filter-header"
+                            onClick={(e) => { e.stopPropagation(); closeAllFilters(); setShowStartDateFilter((v) => !v); }}
+                          >
+                            <div className="semantic-filter-header-inner" ref={startDateFilterRef}>
+                              <span>
+                                Start Date
+                                <Icon name="filter" size="small" style={{ marginLeft: 4, opacity: (startDateFrom || startDateTo) ? 1 : 0.4 }} />
+                                {(startDateFrom || startDateTo) && <span className="semantic-filter-badge" />}
+                              </span>
+                              {showStartDateFilter && (
+                                <div className="semantic-header-dropdown" onClick={(e) => e.stopPropagation()}>
+                                  <label>From</label>
+                                  <input
+                                    type="date"
+                                    value={startDateFrom}
+                                    min={dataDateRange.min}
+                                    max={dataDateRange.max}
+                                    onChange={(e) => setStartDateFrom(e.target.value)}
+                                  />
+                                  <label>To</label>
+                                  <input
+                                    type="date"
+                                    value={startDateTo}
+                                    min={dataDateRange.min}
+                                    max={dataDateRange.max}
+                                    onChange={(e) => setStartDateTo(e.target.value)}
+                                  />
+                                  <button
+                                    className="semantic-filter-clear-btn"
+                                    type="button"
+                                    onClick={() => { setStartDateFrom(''); setStartDateTo(''); }}
+                                  >
+                                    Clear
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          </Table.HeaderCell>
+
+                          {/* End Date filter header */}
+                          <Table.HeaderCell
+                            className="semantic-filter-header"
+                            onClick={(e) => { e.stopPropagation(); closeAllFilters(); setShowEndDateFilter((v) => !v); }}
+                          >
+                            <div className="semantic-filter-header-inner" ref={endDateFilterRef}>
+                              <span>
+                                End Date
+                                <Icon name="filter" size="small" style={{ marginLeft: 4, opacity: (endDateFrom || endDateTo) ? 1 : 0.4 }} />
+                                {(endDateFrom || endDateTo) && <span className="semantic-filter-badge" />}
+                              </span>
+                              {showEndDateFilter && (
+                                <div className="semantic-header-dropdown" onClick={(e) => e.stopPropagation()}>
+                                  <label>From</label>
+                                  <input
+                                    type="date"
+                                    value={endDateFrom}
+                                    min={dataDateRange.min}
+                                    max={dataDateRange.max}
+                                    onChange={(e) => setEndDateFrom(e.target.value)}
+                                  />
+                                  <label>To</label>
+                                  <input
+                                    type="date"
+                                    value={endDateTo}
+                                    min={dataDateRange.min}
+                                    max={dataDateRange.max}
+                                    onChange={(e) => setEndDateTo(e.target.value)}
+                                  />
+                                  <button
+                                    className="semantic-filter-clear-btn"
+                                    type="button"
+                                    onClick={() => { setEndDateFrom(''); setEndDateTo(''); }}
+                                  >
+                                    Clear
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          </Table.HeaderCell>
+
+                          <Table.HeaderCell sorted={sortConfig.key === 'assignedRoom' ? sortConfig.direction : null} onClick={() => handleSort('assignedRoom')}>Room No</Table.HeaderCell>
+
+                          {/* Status filter header */}
+                          <Table.HeaderCell
+                            className="semantic-filter-header"
+                            onClick={(e) => { e.stopPropagation(); closeAllFilters(); setShowStatusFilter((v) => !v); }}
+                          >
+                            <div className="semantic-filter-header-inner" ref={statusFilterRef}>
+                              <span>
+                                Status
+                                <Icon name="filter" size="small" style={{ marginLeft: 4, opacity: selectedStatuses.length > 0 ? 1 : 0.4 }} />
+                                {selectedStatuses.length > 0 && <span className="semantic-filter-badge" />}
+                              </span>
+                              {showStatusFilter && (
+                                <div className="semantic-header-dropdown semantic-status-dropdown" onClick={(e) => e.stopPropagation()}>
+                                  {availableStatuses.map((status) => (
+                                    <div key={status} className="semantic-status-option">
+                                      <Checkbox
+                                        label={status}
+                                        checked={selectedStatuses.includes(status)}
+                                        onChange={() => toggleStatusFilter(status)}
+                                      />
+                                    </div>
+                                  ))}
+                                  <div className="semantic-filter-dropdown-divider" />
+                                  <button
+                                    className="semantic-filter-clear-btn"
+                                    type="button"
+                                    onClick={() => setSelectedStatuses([])}
+                                  >
+                                    Clear All
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          </Table.HeaderCell>
                         </Table.Row>
                       </Table.Header>
                       <Table.Body>

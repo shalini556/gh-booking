@@ -17,7 +17,10 @@
 }
 
 .app-shell {
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
   background:
     radial-gradient(
       circle at top left,
@@ -138,7 +141,10 @@
 }
 
 .app-main {
+  flex: 1;
   padding: 5px;
+  overflow: hidden;
+  min-height: 0;
 }
 
 .app-footer {
@@ -167,17 +173,23 @@
 
 .page-shell.semantic-shell {
   max-width: 1360px;
-  min-height: auto;
+  height: 100%;
   margin: 0 auto;
   padding: 0;
   background: transparent;
+  display: flex;
+  flex-direction: column;
 }
 
 .semantic-dashboard-shell {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  min-height: 0;
+  overflow: hidden;
 }
+
+
 
 .semantic-hero.ui.segment {
   margin: 0;
@@ -294,16 +306,16 @@
 
 .semantic-panel.ui.segment {
   margin: 0;
-  padding: 35px 155px;
+  padding: 20px;
   border: 1px solid var(--portal-border);
-  border-radius: 22px;
+  border-radius: 18px;
   background: var(--portal-surface);
   box-shadow: var(--portal-shadow);
+  overflow: hidden;
 }
 
 .compact-panel.ui.segment {
-  padding-top: 10px;
-  padding-bottom: 10px;
+  padding: 16px;
 }
 
 .semantic-panel-head,
@@ -389,11 +401,10 @@
   align-items: center;
   gap: 10px;
   width: 100%;
-  min-height: 62px;
-  padding: 8px 10px;
-  border: 1px solid #cfd8eb;
-  border-radius: 14px;
-  background: #b4b4df;
+  padding: 12px;
+  border: 1px solid var(--portal-border);
+  border-radius: 12px;
+  background: #f8fafc;
   color: var(--portal-text);
   text-align: left;
   cursor: pointer;
@@ -407,25 +418,28 @@
 
 .semantic-room-card:hover,
 .semantic-room-card:focus-visible {
-  border-color: #a8b8df;
-  background: #ece9ff;
+  border-color: var(--portal-green);
+  background: var(--portal-green-soft);
+  box-shadow: 0 2px 8px rgba(45, 125, 104, 0.1);
 }
 
 .semantic-room-card-active {
-  border-color: #9aa9d6;
-  background: #e8e4fb;
+  border-color: var(--portal-green);
+  background: var(--portal-green-soft);
+  box-shadow: inset 3px 0 0 var(--portal-green);
 }
 
 .semantic-room-card__icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
   border-radius: 10px;
-  background: rgba(20, 58, 90, 0.08);
-  color: #6f7691;
+  background: rgba(45, 125, 104, 0.1);
+  color: var(--portal-green);
   flex-shrink: 0;
+  font-size: 1.1rem;
 }
 
 .semantic-room-card__content {
@@ -433,12 +447,14 @@
   flex-direction: column;
   min-width: 0;
   gap: 2px;
+  overflow: hidden;
 }
 
 .semantic-room-card strong {
   color: var(--portal-navy);
-  font-size: 0.95rem;
-  line-height: 1.15;
+  font-size: 0.85rem;
+  font-weight: 700;
+  line-height: 1.25;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -446,8 +462,8 @@
 
 .semantic-room-card small {
   color: var(--portal-text-soft);
-  font-size: 0.76rem;
-  line-height: 1.15;
+  font-size: 0.72rem;
+  line-height: 1.2;
 }
 
 .semantic-inline-filter.ui.form,
@@ -565,11 +581,9 @@
 }
 
 .semantic-table-wrap {
-  overflow-x: auto;
-  overflow-y: visible;
+  overflow: visible;
   border: 1px solid var(--portal-border);
-  border-radius: 0px;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  border-radius: 10px;
   position: relative;
 }
 
@@ -577,45 +591,46 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 320px;
+  min-height: 280px;
   padding: 24px;
-  border-radius: 18px;
-  background: #f1f1f1;
+  border-radius: 14px;
+  background: var(--portal-surface-soft);
   text-align: center;
 }
 
 .semantic-table-empty-state p {
   margin: 0;
   max-width: 420px;
-  color: black;
-  font-size: 1rem;
+  color: var(--portal-text-soft);
+  font-size: 0.95rem;
   font-weight: 600;
   line-height: 1.6;
 }
 
 .semantic-table-wrap .ui.table {
-  min-width: 1050px;
   margin: 0;
   border: 0;
-  border-radius: 18px;
+  border-radius: 10px;
   overflow: visible;
   table-layout: fixed;
   width: 100%;
 }
 
 .semantic-table-wrap .ui.table thead th {
-  padding: 12px 14px;
+  padding: 6px 8px;
   background: #edf4f1;
   color: var(--portal-navy);
-  font-size: 0.78rem;
+  font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
   border-color: #dde7e3;
   overflow: visible;
   position: relative;
-  width: calc(100% / 8);
-  vertical-align: top;
+  vertical-align: middle;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
 }
 
 .semantic-column-header {
@@ -690,10 +705,13 @@
 }
 
 .semantic-table-wrap .ui.table tbody td {
-  padding: 12px 14px;
+  padding: 5px 8px;
   color: var(--portal-text);
-  font-size: 0.92rem;
+  font-size: 0.8rem;
   border-color: #e5ece9;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .semantic-table-wrap .ui.table tbody tr {
@@ -955,12 +973,20 @@
 }
 
 .semantic-compact-modal.ui.large.modal {
-  width: min(1180px, 95vw);
-  margin-top: 1.5rem;
+  width: min(1180px, 95vw) !important;
+  margin: 1.5rem auto !important;
+  max-height: 85vh !important;
+  top: auto !important;
+  bottom: auto !important;
+  display: flex !important;
+  flex-direction: column;
 }
 
 .semantic-compact-modal > .content {
-  padding: 0.75rem 1rem 0.9rem;
+  padding: 0.75rem 1rem 0.9rem !important;
+  flex: 1 1 auto;
+  overflow-y: auto;
+  min-height: 0;
 }
 
 .semantic-detail-card-grid {
@@ -1084,74 +1110,246 @@
 }
 
 .semantic-table-wrap .ui.table.semantic-booking-table {
-  min-width: 860px;
+  width: 100%;
   table-layout: fixed;
 }
 
-.semantic-table-wrap .ui.table.semantic-booking-table thead th,
-.semantic-table-wrap .ui.table.semantic-booking-table tbody td {
-  padding: 8px 10px;
-  font-size: 0.92rem;
-}
-
-.semantic-table-wrap .ui.table.semantic-booking-table thead th {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.semantic-table-wrap .ui.table.semantic-booking-table tbody td {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
+/* Col 1: Booking ID */
 .semantic-table-wrap .ui.table.semantic-booking-table thead th:nth-child(1),
 .semantic-table-wrap .ui.table.semantic-booking-table tbody td:nth-child(1) {
-  width: 48px;
+  width: 9%;
 }
 
+/* Col 2: Applicant */
 .semantic-table-wrap .ui.table.semantic-booking-table thead th:nth-child(2),
 .semantic-table-wrap .ui.table.semantic-booking-table tbody td:nth-child(2) {
-  width: 110px;
+  width: 11%;
 }
 
+/* Col 3: Guest House Name */
 .semantic-table-wrap .ui.table.semantic-booking-table thead th:nth-child(3),
 .semantic-table-wrap .ui.table.semantic-booking-table tbody td:nth-child(3) {
-  width: 100px;
+  width: 14%;
 }
 
+/* Col 4: Type */
 .semantic-table-wrap .ui.table.semantic-booking-table thead th:nth-child(4),
 .semantic-table-wrap .ui.table.semantic-booking-table tbody td:nth-child(4) {
-  width: 48px;
+  width: 8%;
 }
 
+/* Col 5: No. of Guests */
 .semantic-table-wrap .ui.table.semantic-booking-table thead th:nth-child(5),
 .semantic-table-wrap .ui.table.semantic-booking-table tbody td:nth-child(5) {
-  width: 60px;
+  width: 10%;
 }
 
+/* Col 6: Start Date */
 .semantic-table-wrap .ui.table.semantic-booking-table thead th:nth-child(6),
-.semantic-table-wrap .ui.table.semantic-booking-table tbody td:nth-child(6),
+.semantic-table-wrap .ui.table.semantic-booking-table tbody td:nth-child(6) {
+  width: 11%;
+}
+
+/* Col 7: End Date */
 .semantic-table-wrap .ui.table.semantic-booking-table thead th:nth-child(7),
 .semantic-table-wrap .ui.table.semantic-booking-table tbody td:nth-child(7) {
-  width: 60px;
+  width: 11%;
 }
 
+/* Col 8: Room No */
 .semantic-table-wrap .ui.table.semantic-booking-table thead th:nth-child(8),
 .semantic-table-wrap .ui.table.semantic-booking-table tbody td:nth-child(8) {
-  width: 55px;
+  width: 8%;
 }
 
+/* Col 9: Status */
 .semantic-table-wrap .ui.table.semantic-booking-table thead th:nth-child(9),
 .semantic-table-wrap .ui.table.semantic-booking-table tbody td:nth-child(9) {
-  width: 45px;
+  width: 12%;
+}
+
+/* ── Header Filter Dropdowns ── */
+.semantic-filter-header {
+  cursor: pointer !important;
+  position: relative !important;
+  user-select: none;
+  overflow: visible !important;
+}
+
+.semantic-filter-header-inner {
+  position: relative;
+  display: inline-block;
+}
+
+.semantic-filter-header-inner > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.semantic-filter-badge {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--portal-green);
+  margin-left: 3px;
+  vertical-align: middle;
+}
+
+.semantic-header-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 210px;
+  padding: 14px;
+  border: 1px solid var(--portal-border-strong);
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 10px 28px rgba(13, 42, 66, 0.22);
+  z-index: 9999;
+  cursor: default;
+}
+
+.semantic-header-dropdown label {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--portal-navy);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.semantic-header-dropdown input[type="date"] {
+  display: block;
+  width: 100%;
+  padding: 7px 10px;
+  margin-bottom: 10px;
+  border: 1px solid var(--portal-border);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  color: var(--portal-text);
+  background: var(--portal-surface-soft);
+  outline: none;
+}
+
+.semantic-header-dropdown input[type="date"]:focus {
+  border-color: var(--portal-green);
+}
+
+.semantic-filter-clear-btn {
+  display: block;
+  width: 100%;
+  padding: 6px 0;
+  margin-top: 4px;
+  border: none;
+  border-radius: 8px;
+  background: var(--portal-surface-strong);
+  color: var(--portal-text-soft);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 150ms ease, color 150ms ease;
+}
+
+.semantic-filter-clear-btn:hover {
+  background: var(--portal-green-soft);
+  color: var(--portal-green);
+}
+
+.semantic-status-dropdown {
+  min-width: 180px;
+  left: auto !important;
+  right: 0 !important;
+  transform: none !important;
+}
+
+.semantic-status-option {
+  padding: 6px 4px;
+}
+
+.semantic-status-option .ui.checkbox label {
+  font-size: 0.85rem;
+  color: var(--portal-text);
+}
+
+.semantic-filter-dropdown-divider {
+  height: 1px;
+  margin: 8px 0;
+  background: var(--portal-border);
+}
+
+/* Type filter dropdown */
+.semantic-type-dropdown {
+  min-width: 160px;
+}
+
+/* Guests slider dropdown */
+.semantic-guests-dropdown {
+  min-width: 220px;
+}
+
+.semantic-guests-slider-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  font-size: 0.8rem;
+  color: var(--portal-text-soft);
+}
+
+.semantic-guests-slider-label strong {
+  color: var(--portal-navy);
+  font-size: 0.9rem;
+}
+
+.semantic-guests-slider-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.semantic-range-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 4px;
+  background: var(--portal-border);
+  outline: none;
+  cursor: pointer;
+  accent-color: var(--portal-green);
+}
+
+.semantic-range-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--portal-green);
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
+  cursor: pointer;
+}
+
+.semantic-range-slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--portal-green);
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
+  cursor: pointer;
 }
 
 .semantic-table-pagination {
   display: flex;
   justify-content: flex-end;
-  margin-top: 16px;
+  margin-top: 6px;
 }
 
 .semantic-table-pagination .ui.pagination.menu {
@@ -1159,9 +1357,74 @@
   border-radius: 999px;
   border: 1px solid rgba(15, 23, 42, 0.12);
   overflow: hidden;
+  font-size: 0.8rem;
+  min-height: 32px;
 }
 
 .semantic-table-pagination .ui.pagination.menu .item {
-  min-width: 42px;
+  min-width: 32px;
   justify-content: center;
+  font-size: 0.8rem;
+  padding: 4px 8px;
+}
+
+/* ── Dashboard side-by-side layout ── */
+.semantic-dashboard-layout {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 8px;
+  align-items: start;
+  flex: 1;
+  min-height: 0;
+  overflow: visible;
+}
+
+#room-allotment .semantic-panel.ui.segment {
+  padding: 12px;
+  position: sticky;
+  top: 80px;
+}
+
+#booking-requests {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+#booking-requests .semantic-panel.ui.segment {
+  padding: 10px 14px;
+  overflow: visible;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.semantic-room-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+@media (max-width: 1100px) {
+  .semantic-dashboard-layout {
+    grid-template-columns: 220px 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  .semantic-dashboard-layout {
+    grid-template-columns: 1fr;
+  }
+  .semantic-room-card-list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+  }
+}
+
+@media (max-width: 640px) {
+  .semantic-room-card-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
