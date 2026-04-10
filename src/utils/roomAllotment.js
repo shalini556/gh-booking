@@ -16,6 +16,10 @@ function toDate(value) {
   return new Date(`${value}T00:00:00`);
 }
 
+function normalizeRoomType(value) {
+  return (value || "").trim().toLowerCase();
+}
+
 export function validateBookingDates(checkInDate, checkOutDate) {
   if (!checkInDate || !checkOutDate) {
     throw new Error("Check-in date and check-out date are required.");
@@ -38,7 +42,11 @@ export function hasDateConflict(
   );
 }
 
-export function getApprovedBookingsForRoom(guestHouse, roomNumber, excludeBookingId = "") {
+export function getApprovedBookingsForRoom(
+  guestHouse,
+  roomNumber,
+  excludeBookingId = "",
+) {
   return guestHouse.requests.filter((request) => {
     const assignedRooms = request.assignedRooms || [];
     const usesRoom =
@@ -64,7 +72,9 @@ export function getAvailableRooms(bookingData, bookingRequest) {
   }
 
   const matchingRooms = guestHouse.rooms.filter(
-    (room) => room.roomType === bookingRequest.roomType,
+    (room) =>
+      normalizeRoomType(room.roomType) ===
+      normalizeRoomType(bookingRequest.roomType),
   );
 
   return matchingRooms.filter((room) => {
@@ -110,7 +120,9 @@ export function allotRooms(bookingData, bookingRequest, roomNumbers) {
   }
 
   if (selectedRooms.length !== roomNumbers.length) {
-    throw new Error("One or more selected rooms are not available for the requested dates.");
+    throw new Error(
+      "One or more selected rooms are not available for the requested dates.",
+    );
   }
 
   return {
@@ -135,7 +147,7 @@ export const roomAllotmentExample = {
     bookingRequest: {
       bookingId: "LD-101",
       guestHouse: "LD Guest House",
-      roomType: "Single",
+      roomType: "single",
       checkInDate: "2026-04-01",
       checkOutDate: "2026-04-05",
       status: "pending",

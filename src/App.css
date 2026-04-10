@@ -189,8 +189,6 @@
   overflow: hidden;
 }
 
-
-
 .semantic-hero.ui.segment {
   margin: 0;
   border: 0;
@@ -1117,31 +1115,31 @@
 /* Col 1: Booking ID */
 .semantic-table-wrap .ui.table.semantic-booking-table thead th:nth-child(1),
 .semantic-table-wrap .ui.table.semantic-booking-table tbody td:nth-child(1) {
-  width: 9%;
+  width: 6%;
 }
 
 /* Col 2: Applicant */
 .semantic-table-wrap .ui.table.semantic-booking-table thead th:nth-child(2),
 .semantic-table-wrap .ui.table.semantic-booking-table tbody td:nth-child(2) {
-  width: 11%;
+  width: 14%;
 }
 
 /* Col 3: Guest House Name */
 .semantic-table-wrap .ui.table.semantic-booking-table thead th:nth-child(3),
 .semantic-table-wrap .ui.table.semantic-booking-table tbody td:nth-child(3) {
-  width: 14%;
+  width: 11%;
 }
 
 /* Col 4: Type */
 .semantic-table-wrap .ui.table.semantic-booking-table thead th:nth-child(4),
 .semantic-table-wrap .ui.table.semantic-booking-table tbody td:nth-child(4) {
-  width: 8%;
+  width: 6%;
 }
 
 /* Col 5: No. of Guests */
 .semantic-table-wrap .ui.table.semantic-booking-table thead th:nth-child(5),
 .semantic-table-wrap .ui.table.semantic-booking-table tbody td:nth-child(5) {
-  width: 10%;
+  width: 6%;
 }
 
 /* Col 6: Start Date */
@@ -1156,16 +1154,28 @@
   width: 11%;
 }
 
-/* Col 8: Room No */
+/* Col 8: Room Type */
 .semantic-table-wrap .ui.table.semantic-booking-table thead th:nth-child(8),
 .semantic-table-wrap .ui.table.semantic-booking-table tbody td:nth-child(8) {
   width: 8%;
 }
 
-/* Col 9: Status */
+/* Col 9: Room No */
 .semantic-table-wrap .ui.table.semantic-booking-table thead th:nth-child(9),
 .semantic-table-wrap .ui.table.semantic-booking-table tbody td:nth-child(9) {
-  width: 12%;
+  width: 8%;
+}
+
+/* Col 10: Mode of Payment */
+.semantic-table-wrap .ui.table.semantic-booking-table thead th:nth-child(10),
+.semantic-table-wrap .ui.table.semantic-booking-table tbody td:nth-child(10) {
+  width: 10%;
+}
+
+/* Col 11: Status */
+.semantic-table-wrap .ui.table.semantic-booking-table thead th:nth-child(11),
+.semantic-table-wrap .ui.table.semantic-booking-table tbody td:nth-child(11) {
+  width: 10%;
 }
 
 /* ── Header Filter Dropdowns ── */
@@ -1251,7 +1261,9 @@
   font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background 150ms ease, color 150ms ease;
+  transition:
+    background 150ms ease,
+    color 150ms ease;
 }
 
 .semantic-filter-clear-btn:hover {

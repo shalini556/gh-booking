@@ -11,6 +11,32 @@ import "./App.css";
 
 const BOOKING_DATA_STORAGE_KEY = "booking-project1-admin-data-v2";
 
+const buildPaymentModeLookup = (data) =>
+  Object.fromEntries(
+    data.guestHouses.flatMap((guestHouse) =>
+      guestHouse.requests.map((request) => [
+        `${guestHouse.name}:${request.requestId}`,
+        request.modeOfPayment || "",
+      ]),
+    ),
+  );
+
+const PAYMENT_MODE_LOOKUP = buildPaymentModeLookup(guestHouseData);
+
+const hydratePaymentModes = (data) => ({
+  ...data,
+  guestHouses: data.guestHouses.map((guestHouse) => ({
+    ...guestHouse,
+    requests: guestHouse.requests.map((request) => ({
+      ...request,
+      modeOfPayment:
+        request.modeOfPayment ||
+        PAYMENT_MODE_LOOKUP[`${guestHouse.name}:${request.requestId}`] ||
+        "-",
+    })),
+  })),
+});
+
 function App() {
   const [bookingData, setBookingData] = useState(() => {
     const savedBookingData = window.localStorage.getItem(
@@ -18,13 +44,13 @@ function App() {
     );
 
     if (!savedBookingData) {
-      return guestHouseData;
+      return hydratePaymentModes(guestHouseData);
     }
 
     try {
-      return JSON.parse(savedBookingData);
+      return hydratePaymentModes(JSON.parse(savedBookingData));
     } catch (error) {
-      return guestHouseData;
+      return hydratePaymentModes(guestHouseData);
     }
   });
 

@@ -41,12 +41,12 @@ function BookingList({ guestHouse }) {
   const getDisplayBookingType = (bookingType) =>
     bookingType === "Other" ? "Official" : bookingType;
 
+  const getDisplayPaymentMode = (paymentMode) => paymentMode || "-";
+
   const getStatusColor = (status) => {
     switch (status) {
       case "Approved":
         return "green";
-      case "Under Review":
-        return "blue";
       case "Rejected":
         return "red";
       default:
@@ -277,6 +277,7 @@ function BookingList({ guestHouse }) {
                 <Table.HeaderCell>Start Date</Table.HeaderCell>
                 <Table.HeaderCell>End Date</Table.HeaderCell>
                 <Table.HeaderCell>Room</Table.HeaderCell>
+                <Table.HeaderCell>Mode of Payment</Table.HeaderCell>
                 <Table.HeaderCell>Booking Status</Table.HeaderCell>
               </Table.Row>
             </Table.Header>
@@ -296,6 +297,9 @@ function BookingList({ guestHouse }) {
                   <Table.Cell>{getDisplayCheckIn(request)}</Table.Cell>
                   <Table.Cell>{getDisplayCheckOut(request)}</Table.Cell>
                   <Table.Cell>{getAssignedRoomLabel(request)}</Table.Cell>
+                  <Table.Cell>
+                    {getDisplayPaymentMode(request.modeOfPayment)}
+                  </Table.Cell>
                   <Table.Cell>
                     <Label color={getStatusColor(request.status)} size="small">
                       {request.status}

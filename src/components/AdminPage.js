@@ -62,6 +62,11 @@ function AdminPage({ bookingData, onUpdateRequest }) {
   const getDisplayBookingType = (bookingType) =>
     bookingType === "Other" ? "Official" : bookingType;
 
+  const getDisplayRoomType = (roomType) =>
+    roomType ? `${roomType.charAt(0).toUpperCase()}${roomType.slice(1)}` : "-";
+
+  const getDisplayPaymentMode = (paymentMode) => paymentMode || "-";
+
   const getAssignedRoomLabel = (request) => {
     if (request.status !== "Approved") {
       return "-";
@@ -78,8 +83,7 @@ function AdminPage({ bookingData, onUpdateRequest }) {
     switch (status) {
       case "Approved":
         return "green";
-      case "Under Review":
-        return "blue";
+
       case "Rejected":
         return "red";
       default:
@@ -117,17 +121,19 @@ function AdminPage({ bookingData, onUpdateRequest }) {
 
   // Compute available types from data
   const availableTypes = useMemo(() => {
-    const typeSet = new Set(allRequests.map((r) => getDisplayBookingType(r.bookingType)));
+    const typeSet = new Set(
+      allRequests.map((r) => getDisplayBookingType(r.bookingType)),
+    );
     return Array.from(typeSet).sort();
   }, [allRequests]);
 
   // Compute available date range from data
   const dataDateRange = useMemo(() => {
-    let minDate = '';
-    let maxDate = '';
+    let minDate = "";
+    let maxDate = "";
     allRequests.forEach((r) => {
-      const ci = r.checkIn || '';
-      const co = r.checkOut || '';
+      const ci = r.checkIn || "";
+      const co = r.checkOut || "";
       if (ci && (!minDate || ci < minDate)) minDate = ci;
       if (co && (!maxDate || co > maxDate)) maxDate = co;
       if (ci && (!maxDate || ci > maxDate)) maxDate = ci;
@@ -147,7 +153,9 @@ function AdminPage({ bookingData, onUpdateRequest }) {
 
     // Type filter
     if (selectedTypes.length > 0) {
-      result = result.filter((r) => selectedTypes.includes(getDisplayBookingType(r.bookingType)));
+      result = result.filter((r) =>
+        selectedTypes.includes(getDisplayBookingType(r.bookingType)),
+      );
     }
 
     // Start Date range filter
@@ -179,7 +187,15 @@ function AdminPage({ bookingData, onUpdateRequest }) {
     }
 
     return result;
-  }, [allRequests, selectedStatuses, selectedTypes, startDateFrom, startDateTo, endDateFrom, endDateTo]);
+  }, [
+    allRequests,
+    selectedStatuses,
+    selectedTypes,
+    startDateFrom,
+    startDateTo,
+    endDateFrom,
+    endDateTo,
+  ]);
 
   const sortedRequests = useMemo(() => {
     let sortableItems = [...filteredRequests];
@@ -188,25 +204,28 @@ function AdminPage({ bookingData, onUpdateRequest }) {
         let aValue = a[sortConfig.key];
         let bValue = b[sortConfig.key];
 
-        if (sortConfig.key === 'assignedRoom') {
-          aValue = getAssignedRoomLabel(a);
-          bValue = getAssignedRoomLabel(b);
-        } else if (sortConfig.key === 'guestHouseName') {
-          aValue = a.guestHouseName || '';
-          bValue = b.guestHouseName || '';
-        } else if (sortConfig.key === 'bookingType') {
-          aValue = getDisplayBookingType(a.bookingType) || '';
-          bValue = getDisplayBookingType(b.bookingType) || '';
-        } else {
-          aValue = aValue || '';
-          bValue = bValue || '';
-        }
+                        if (sortConfig.key === "assignedRoom") {
+                          aValue = getAssignedRoomLabel(a);
+                          bValue = getAssignedRoomLabel(b);
+                        } else if (sortConfig.key === "guestHouseName") {
+                          aValue = a.guestHouseName || "";
+                          bValue = b.guestHouseName || "";
+                        } else if (sortConfig.key === "bookingType") {
+                          aValue = getDisplayBookingType(a.bookingType) || "";
+                          bValue = getDisplayBookingType(b.bookingType) || "";
+                        } else if (sortConfig.key === "roomType") {
+                          aValue = getDisplayRoomType(a.roomType) || "";
+                          bValue = getDisplayRoomType(b.roomType) || "";
+                        } else {
+                          aValue = aValue || "";
+                          bValue = bValue || "";
+                        }
 
         if (aValue < bValue) {
-          return sortConfig.direction === 'ascending' ? -1 : 1;
+          return sortConfig.direction === "ascending" ? -1 : 1;
         }
         if (aValue > bValue) {
-          return sortConfig.direction === 'ascending' ? 1 : -1;
+          return sortConfig.direction === "ascending" ? 1 : -1;
         }
         return 0;
       });
@@ -214,7 +233,10 @@ function AdminPage({ bookingData, onUpdateRequest }) {
     return sortableItems;
   }, [filteredRequests, sortConfig]);
 
-  const totalPages = Math.max(1, Math.ceil(filteredRequests.length / rowsPerPage));
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredRequests.length / rowsPerPage),
+  );
 
   const paginatedRequests = useMemo(() => {
     const startIndex = (activePage - 1) * rowsPerPage;
@@ -222,9 +244,9 @@ function AdminPage({ bookingData, onUpdateRequest }) {
   }, [activePage, sortedRequests]);
 
   const handleSort = (key) => {
-    let direction = 'ascending';
-    if (sortConfig.key === key && sortConfig.direction === 'ascending') {
-      direction = 'descending';
+    let direction = "ascending";
+    if (sortConfig.key === key && sortConfig.direction === "ascending") {
+      direction = "descending";
     }
     setSortConfig({ key, direction });
   };
@@ -241,9 +263,7 @@ function AdminPage({ bookingData, onUpdateRequest }) {
   // Toggle type checkbox
   const toggleTypeFilter = (type) => {
     setSelectedTypes((prev) =>
-      prev.includes(type)
-        ? prev.filter((t) => t !== type)
-        : [...prev, type],
+      prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type],
     );
   };
 
@@ -257,13 +277,22 @@ function AdminPage({ bookingData, onUpdateRequest }) {
 
   // Close dropdowns when clicking outside
   const handleClickOutside = useCallback((e) => {
-    if (startDateFilterRef.current && !startDateFilterRef.current.contains(e.target)) {
+    if (
+      startDateFilterRef.current &&
+      !startDateFilterRef.current.contains(e.target)
+    ) {
       setShowStartDateFilter(false);
     }
-    if (endDateFilterRef.current && !endDateFilterRef.current.contains(e.target)) {
+    if (
+      endDateFilterRef.current &&
+      !endDateFilterRef.current.contains(e.target)
+    ) {
       setShowEndDateFilter(false);
     }
-    if (statusFilterRef.current && !statusFilterRef.current.contains(e.target)) {
+    if (
+      statusFilterRef.current &&
+      !statusFilterRef.current.contains(e.target)
+    ) {
       setShowStatusFilter(false);
     }
     if (typeFilterRef.current && !typeFilterRef.current.contains(e.target)) {
@@ -272,8 +301,8 @@ function AdminPage({ bookingData, onUpdateRequest }) {
   }, []);
 
   useEffect(() => {
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [handleClickOutside]);
 
   const selectedRequest = useMemo(
@@ -389,8 +418,14 @@ function AdminPage({ bookingData, onUpdateRequest }) {
     ? [
         { label: "Applicant Name", value: selectedRequest.applicantName },
         { label: "Visitor Name", value: selectedRequest.guestName },
-        { label: "Visitor Designation", value: selectedRequest.guestDesignation },
-        { label: "Visitor Organization", value: selectedRequest.guestOrganization },
+        {
+          label: "Visitor Designation",
+          value: selectedRequest.guestDesignation,
+        },
+        {
+          label: "Visitor Organization",
+          value: selectedRequest.guestOrganization,
+        },
         { label: "Visitor Mobile", value: selectedRequest.guestMobileNumber },
         { label: "Visitor Address", value: selectedRequest.guestAddress },
         { label: "Employee ID", value: selectedRequest.employeeId },
@@ -404,7 +439,11 @@ function AdminPage({ bookingData, onUpdateRequest }) {
           label: "Booking Type",
           value: getDisplayBookingType(selectedRequest.bookingType),
         },
-        { label: "Room Type", value: selectedRequest.roomType },
+        {
+          label: "Mode of Payment",
+          value: getDisplayPaymentMode(selectedRequest.modeOfPayment),
+        },
+        { label: "Room Type", value: getDisplayRoomType(selectedRequest.roomType) },
         { label: "Guests", value: selectedRequest.numberOfGuests },
         {
           label:
@@ -533,25 +572,74 @@ function AdminPage({ bookingData, onUpdateRequest }) {
                     >
                       <Table.Header>
                         <Table.Row>
-                          <Table.HeaderCell sorted={sortConfig.key === 'requestId' ? sortConfig.direction : null} onClick={() => handleSort('requestId')}>Booking ID</Table.HeaderCell>
-                          <Table.HeaderCell sorted={sortConfig.key === 'applicantName' ? sortConfig.direction : null} onClick={() => handleSort('applicantName')}>Applicant</Table.HeaderCell>
-                          <Table.HeaderCell sorted={sortConfig.key === 'guestHouseName' ? sortConfig.direction : null} onClick={() => handleSort('guestHouseName')}>Guest House Name</Table.HeaderCell>
+                          <Table.HeaderCell
+                            sorted={
+                              sortConfig.key === "requestId"
+                                ? sortConfig.direction
+                                : null
+                            }
+                            onClick={() => handleSort("requestId")}
+                          >
+                            Booking ID
+                          </Table.HeaderCell>
+                          <Table.HeaderCell
+                            sorted={
+                              sortConfig.key === "applicantName"
+                                ? sortConfig.direction
+                                : null
+                            }
+                            onClick={() => handleSort("applicantName")}
+                          >
+                            Applicant
+                          </Table.HeaderCell>
+                          <Table.HeaderCell
+                            sorted={
+                              sortConfig.key === "guestHouseName"
+                                ? sortConfig.direction
+                                : null
+                            }
+                            onClick={() => handleSort("guestHouseName")}
+                          >
+                            Guest House Name
+                          </Table.HeaderCell>
 
                           {/* Type filter header */}
                           <Table.HeaderCell
                             className="semantic-filter-header"
-                            onClick={(e) => { e.stopPropagation(); closeAllFilters(); setShowTypeFilter((v) => !v); }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              closeAllFilters();
+                              setShowTypeFilter((v) => !v);
+                            }}
                           >
-                            <div className="semantic-filter-header-inner" ref={typeFilterRef}>
+                            <div
+                              className="semantic-filter-header-inner"
+                              ref={typeFilterRef}
+                            >
                               <span>
                                 Type
-                                <Icon name="filter" size="small" style={{ marginLeft: 4, opacity: selectedTypes.length > 0 ? 1 : 0.4 }} />
-                                {selectedTypes.length > 0 && <span className="semantic-filter-badge" />}
+                                <Icon
+                                  name="filter"
+                                  size="small"
+                                  style={{
+                                    marginLeft: 4,
+                                    opacity: selectedTypes.length > 0 ? 1 : 0.4,
+                                  }}
+                                />
+                                {selectedTypes.length > 0 && (
+                                  <span className="semantic-filter-badge" />
+                                )}
                               </span>
                               {showTypeFilter && (
-                                <div className="semantic-header-dropdown semantic-type-dropdown" onClick={(e) => e.stopPropagation()}>
+                                <div
+                                  className="semantic-header-dropdown semantic-type-dropdown"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
                                   {availableTypes.map((type) => (
-                                    <div key={type} className="semantic-status-option">
+                                    <div
+                                      key={type}
+                                      className="semantic-status-option"
+                                    >
                                       <Checkbox
                                         label={type}
                                         checked={selectedTypes.includes(type)}
@@ -572,28 +660,59 @@ function AdminPage({ bookingData, onUpdateRequest }) {
                             </div>
                           </Table.HeaderCell>
 
-                          <Table.HeaderCell sorted={sortConfig.key === 'numberOfGuests' ? sortConfig.direction : null} onClick={() => handleSort('numberOfGuests')}>No. of Guests</Table.HeaderCell>
+                          <Table.HeaderCell
+                            sorted={
+                              sortConfig.key === "numberOfGuests"
+                                ? sortConfig.direction
+                                : null
+                            }
+                            onClick={() => handleSort("numberOfGuests")}
+                          >
+                            No. of Guests
+                          </Table.HeaderCell>
 
                           {/* Start Date filter header */}
                           <Table.HeaderCell
                             className="semantic-filter-header"
-                            onClick={(e) => { e.stopPropagation(); closeAllFilters(); setShowStartDateFilter((v) => !v); }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              closeAllFilters();
+                              setShowStartDateFilter((v) => !v);
+                            }}
                           >
-                            <div className="semantic-filter-header-inner" ref={startDateFilterRef}>
+                            <div
+                              className="semantic-filter-header-inner"
+                              ref={startDateFilterRef}
+                            >
                               <span>
                                 Start Date
-                                <Icon name="filter" size="small" style={{ marginLeft: 4, opacity: (startDateFrom || startDateTo) ? 1 : 0.4 }} />
-                                {(startDateFrom || startDateTo) && <span className="semantic-filter-badge" />}
+                                <Icon
+                                  name="filter"
+                                  size="small"
+                                  style={{
+                                    marginLeft: 4,
+                                    opacity:
+                                      startDateFrom || startDateTo ? 1 : 0.4,
+                                  }}
+                                />
+                                {(startDateFrom || startDateTo) && (
+                                  <span className="semantic-filter-badge" />
+                                )}
                               </span>
                               {showStartDateFilter && (
-                                <div className="semantic-header-dropdown" onClick={(e) => e.stopPropagation()}>
+                                <div
+                                  className="semantic-header-dropdown"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
                                   <label>From</label>
                                   <input
                                     type="date"
                                     value={startDateFrom}
                                     min={dataDateRange.min}
                                     max={dataDateRange.max}
-                                    onChange={(e) => setStartDateFrom(e.target.value)}
+                                    onChange={(e) =>
+                                      setStartDateFrom(e.target.value)
+                                    }
                                   />
                                   <label>To</label>
                                   <input
@@ -601,12 +720,17 @@ function AdminPage({ bookingData, onUpdateRequest }) {
                                     value={startDateTo}
                                     min={dataDateRange.min}
                                     max={dataDateRange.max}
-                                    onChange={(e) => setStartDateTo(e.target.value)}
+                                    onChange={(e) =>
+                                      setStartDateTo(e.target.value)
+                                    }
                                   />
                                   <button
                                     className="semantic-filter-clear-btn"
                                     type="button"
-                                    onClick={() => { setStartDateFrom(''); setStartDateTo(''); }}
+                                    onClick={() => {
+                                      setStartDateFrom("");
+                                      setStartDateTo("");
+                                    }}
                                   >
                                     Clear
                                   </button>
@@ -618,23 +742,44 @@ function AdminPage({ bookingData, onUpdateRequest }) {
                           {/* End Date filter header */}
                           <Table.HeaderCell
                             className="semantic-filter-header"
-                            onClick={(e) => { e.stopPropagation(); closeAllFilters(); setShowEndDateFilter((v) => !v); }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              closeAllFilters();
+                              setShowEndDateFilter((v) => !v);
+                            }}
                           >
-                            <div className="semantic-filter-header-inner" ref={endDateFilterRef}>
+                            <div
+                              className="semantic-filter-header-inner"
+                              ref={endDateFilterRef}
+                            >
                               <span>
                                 End Date
-                                <Icon name="filter" size="small" style={{ marginLeft: 4, opacity: (endDateFrom || endDateTo) ? 1 : 0.4 }} />
-                                {(endDateFrom || endDateTo) && <span className="semantic-filter-badge" />}
+                                <Icon
+                                  name="filter"
+                                  size="small"
+                                  style={{
+                                    marginLeft: 4,
+                                    opacity: endDateFrom || endDateTo ? 1 : 0.4,
+                                  }}
+                                />
+                                {(endDateFrom || endDateTo) && (
+                                  <span className="semantic-filter-badge" />
+                                )}
                               </span>
                               {showEndDateFilter && (
-                                <div className="semantic-header-dropdown" onClick={(e) => e.stopPropagation()}>
+                                <div
+                                  className="semantic-header-dropdown"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
                                   <label>From</label>
                                   <input
                                     type="date"
                                     value={endDateFrom}
                                     min={dataDateRange.min}
                                     max={dataDateRange.max}
-                                    onChange={(e) => setEndDateFrom(e.target.value)}
+                                    onChange={(e) =>
+                                      setEndDateFrom(e.target.value)
+                                    }
                                   />
                                   <label>To</label>
                                   <input
@@ -642,12 +787,17 @@ function AdminPage({ bookingData, onUpdateRequest }) {
                                     value={endDateTo}
                                     min={dataDateRange.min}
                                     max={dataDateRange.max}
-                                    onChange={(e) => setEndDateTo(e.target.value)}
+                                    onChange={(e) =>
+                                      setEndDateTo(e.target.value)
+                                    }
                                   />
                                   <button
                                     className="semantic-filter-clear-btn"
                                     type="button"
-                                    onClick={() => { setEndDateFrom(''); setEndDateTo(''); }}
+                                    onClick={() => {
+                                      setEndDateFrom("");
+                                      setEndDateTo("");
+                                    }}
                                   >
                                     Clear
                                   </button>
@@ -656,27 +806,85 @@ function AdminPage({ bookingData, onUpdateRequest }) {
                             </div>
                           </Table.HeaderCell>
 
-                          <Table.HeaderCell sorted={sortConfig.key === 'assignedRoom' ? sortConfig.direction : null} onClick={() => handleSort('assignedRoom')}>Room No</Table.HeaderCell>
+                          <Table.HeaderCell
+                            sorted={
+                              sortConfig.key === "roomType"
+                                ? sortConfig.direction
+                                : null
+                            }
+                            onClick={() => handleSort("roomType")}
+                          >
+                            Room Type
+                          </Table.HeaderCell>
+
+                          <Table.HeaderCell
+                            sorted={
+                              sortConfig.key === "assignedRoom"
+                                ? sortConfig.direction
+                                : null
+                            }
+                            onClick={() => handleSort("assignedRoom")}
+                          >
+                            Room No
+                          </Table.HeaderCell>
+
+                          <Table.HeaderCell
+                            sorted={
+                              sortConfig.key === "modeOfPayment"
+                                ? sortConfig.direction
+                                : null
+                            }
+                            onClick={() => handleSort("modeOfPayment")}
+                          >
+                            Mode of Payment
+                          </Table.HeaderCell>
 
                           {/* Status filter header */}
                           <Table.HeaderCell
                             className="semantic-filter-header"
-                            onClick={(e) => { e.stopPropagation(); closeAllFilters(); setShowStatusFilter((v) => !v); }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              closeAllFilters();
+                              setShowStatusFilter((v) => !v);
+                            }}
                           >
-                            <div className="semantic-filter-header-inner" ref={statusFilterRef}>
+                            <div
+                              className="semantic-filter-header-inner"
+                              ref={statusFilterRef}
+                            >
                               <span>
                                 Status
-                                <Icon name="filter" size="small" style={{ marginLeft: 4, opacity: selectedStatuses.length > 0 ? 1 : 0.4 }} />
-                                {selectedStatuses.length > 0 && <span className="semantic-filter-badge" />}
+                                <Icon
+                                  name="filter"
+                                  size="small"
+                                  style={{
+                                    marginLeft: 4,
+                                    opacity:
+                                      selectedStatuses.length > 0 ? 1 : 0.4,
+                                  }}
+                                />
+                                {selectedStatuses.length > 0 && (
+                                  <span className="semantic-filter-badge" />
+                                )}
                               </span>
                               {showStatusFilter && (
-                                <div className="semantic-header-dropdown semantic-status-dropdown" onClick={(e) => e.stopPropagation()}>
+                                <div
+                                  className="semantic-header-dropdown semantic-status-dropdown"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
                                   {availableStatuses.map((status) => (
-                                    <div key={status} className="semantic-status-option">
+                                    <div
+                                      key={status}
+                                      className="semantic-status-option"
+                                    >
                                       <Checkbox
                                         label={status}
-                                        checked={selectedStatuses.includes(status)}
-                                        onChange={() => toggleStatusFilter(status)}
+                                        checked={selectedStatuses.includes(
+                                          status,
+                                        )}
+                                        onChange={() =>
+                                          toggleStatusFilter(status)
+                                        }
                                       />
                                     </div>
                                   ))}
@@ -711,9 +919,21 @@ function AdminPage({ bookingData, onUpdateRequest }) {
                               {getDisplayBookingType(request.bookingType)}
                             </Table.Cell>
                             <Table.Cell>{request.numberOfGuests}</Table.Cell>
-                            <Table.Cell>{getDisplayCheckIn(request)}</Table.Cell>
-                            <Table.Cell>{getDisplayCheckOut(request)}</Table.Cell>
-                            <Table.Cell>{getAssignedRoomLabel(request)}</Table.Cell>
+                            <Table.Cell>
+                              {getDisplayCheckIn(request)}
+                            </Table.Cell>
+                            <Table.Cell>
+                              {getDisplayCheckOut(request)}
+                            </Table.Cell>
+                            <Table.Cell>
+                              {getDisplayRoomType(request.roomType)}
+                            </Table.Cell>
+                            <Table.Cell>
+                              {getAssignedRoomLabel(request)}
+                            </Table.Cell>
+                            <Table.Cell>
+                              {getDisplayPaymentMode(request.modeOfPayment)}
+                            </Table.Cell>
                             <Table.Cell>
                               <Label
                                 color={getStatusColor(request.status)}
@@ -843,7 +1063,7 @@ function AdminPage({ bookingData, onUpdateRequest }) {
                       type="button"
                     >
                       <div>{room.roomNumber}</div>
-                      <small>{room.roomType}</small>
+                      <small>{getDisplayRoomType(room.roomType)}</small>
                     </Button>
                   ))}
                 </div>
