@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
+import { Message } from "semantic-ui-react";
 import AdminPage from "./components/AdminPage";
+import ApplicationStayForm from "./components/form";
+import bookingRequestFormData from "./data/bookingRequestFormData.json";
 import guestHouseData from "./data/guestHouseData.json";
 import logo from "./resources/logo.png";
 import {
@@ -9,7 +12,181 @@ import {
 } from "./utils/roomAllotment";
 import "./App.css";
 
-const BOOKING_DATA_STORAGE_KEY = "booking-project1-admin-data-v2";
+const BOOKING_DATA_STORAGE_KEY = "booking-project1-admin-data-v5";
+
+const FORM_REQUEST_CONFIGS = [
+  {
+    formPrefix: "LD",
+    requestPrefix: "L",
+    guestHouseName: "LD Guest House",
+  },
+  {
+    formPrefix: "FG",
+    requestPrefix: "F",
+    guestHouseName: "Faculty Guest House",
+  },
+  {
+    formPrefix: "SSB",
+    requestPrefix: "S",
+    guestHouseName: "SSB Guest House",
+  },
+  {
+    formPrefix: "UG",
+    requestPrefix: "U",
+    guestHouseName: "University Guest House",
+  },
+];
+
+const getFormConfigForGuestHouse = (guestHouseName) =>
+  FORM_REQUEST_CONFIGS.find(
+    (config) => config.guestHouseName === guestHouseName,
+  );
+
+const getRequestIdFromFormKey = (formKey, requestPrefix) => {
+  const sequence = formKey.split("-").pop();
+  return `${requestPrefix}${sequence}`;
+};
+
+const parseApplicantInfo = (formRecord) => {
+  const [applicantName = "", employeeId = ""] = (
+    formRecord.applicantNameAndEmployeeId || ""
+  )
+    .split("|")
+    .map((item) => item.trim());
+  const [designation = "", department = ""] = (
+    formRecord.applicantDesignationDepartment || ""
+  )
+    .split("|")
+    .map((item) => item.trim());
+
+  return {
+    applicantName,
+    employeeId,
+    designation,
+    department,
+  };
+};
+
+const getSelectedPaymentMode = (formRecord) =>
+  formRecord.paymentModes?.find((paymentMode) => paymentMode.checked)?.label ||
+  "";
+
+const getFallbackDate = (formIndex, offsetDays = 0) => {
+  const date = new Date(Date.UTC(2026, 4, 1 + formIndex + offsetDays));
+  return date.toISOString().slice(0, 10);
+};
+
+const getRequestFromFormRecord = ({
+  existingRequest,
+  formIndex,
+  formKey,
+  formRecord,
+  guestHouseName,
+  requestPrefix,
+}) => {
+  const requestId = getRequestIdFromFormKey(formKey, requestPrefix);
+  const applicantInfo = parseApplicantInfo(formRecord);
+  const numberOfGuests = String(
+    Math.max(1, (formRecord.accompanyingPersons?.length || 0) + 1),
+  );
+
+  return {
+    ...existingRequest,
+    requestId,
+    bookingId: requestId,
+    applicantName:
+      applicantInfo.applicantName || existingRequest?.applicantName || "-",
+    bookingType: existingRequest?.bookingType || "Other",
+    roomType:
+      existingRequest?.roomType ||
+      (Number(formRecord.roomCount || 1) > 1 ? "double" : "single"),
+    numberOfGuests: existingRequest?.numberOfGuests || numberOfGuests,
+    employeeId: applicantInfo.employeeId || existingRequest?.employeeId || "-",
+    department: applicantInfo.department || existingRequest?.department || "-",
+    designation:
+      applicantInfo.designation || existingRequest?.designation || "-",
+    email: formRecord.emailId || existingRequest?.email || "-",
+    phone: formRecord.applicantMobileNumber || existingRequest?.phone || "-",
+    stayLocation: guestHouseName,
+    checkIn: existingRequest?.checkIn || getFallbackDate(formIndex),
+    checkOut: existingRequest?.checkOut || getFallbackDate(formIndex, 2),
+    purpose: formRecord.visitPurpose || existingRequest?.purpose || "-",
+    submittedOn: existingRequest?.submittedOn || getFallbackDate(formIndex, -7),
+    status: existingRequest?.status || "Pending",
+    assignedRoom: existingRequest?.assignedRoom || "",
+    assignedRooms: existingRequest?.assignedRooms || [],
+    allottedCheckIn: existingRequest?.allottedCheckIn || "",
+    allottedCheckOut: existingRequest?.allottedCheckOut || "",
+    guestName: formRecord.guestName || existingRequest?.guestName || "-",
+    guestMobileNumber:
+      formRecord.guestMobileNumber || existingRequest?.guestMobileNumber || "-",
+    guestDesignation:
+      formRecord.guestDesignation || existingRequest?.guestDesignation || "-",
+    guestOrganization: existingRequest?.guestOrganization || "-",
+    guestAddress:
+      formRecord.guestAddress || existingRequest?.guestAddress || "-",
+    accompanyingPersons:
+      formRecord.accompanyingPersons ||
+      existingRequest?.accompanyingPersons ||
+      [],
+    modeOfPayment:
+      getSelectedPaymentMode(formRecord) ||
+      existingRequest?.modeOfPayment ||
+      "-",
+  };
+};
+
+const mergeBookingRequestForms = (data) => ({
+  ...data,
+  guestHouses: data.guestHouses.map((guestHouse) => {
+    const config = getFormConfigForGuestHouse(guestHouse.name);
+
+    if (!config) {
+      return guestHouse;
+    }
+
+    const existingRequestsById = new Map(
+      guestHouse.requests.map((request) => [request.requestId, request]),
+    );
+    const formEntries = Object.entries(bookingRequestFormData)
+      .filter(([formKey]) => formKey.startsWith(`${config.formPrefix}-`))
+      .sort(
+        ([formKeyA], [formKeyB]) =>
+          Number(formKeyA.split("-").pop()) - Number(formKeyB.split("-").pop()),
+      );
+
+    const mergedFormRequests = formEntries.map(
+      ([formKey, formRecord], formIndex) => {
+        const requestId = getRequestIdFromFormKey(
+          formKey,
+          config.requestPrefix,
+        );
+
+        return getRequestFromFormRecord({
+          existingRequest: existingRequestsById.get(requestId),
+          formIndex,
+          formKey,
+          formRecord,
+          guestHouseName: guestHouse.name,
+          requestPrefix: config.requestPrefix,
+        });
+      },
+    );
+    const formRequestIds = new Set(
+      mergedFormRequests.map((request) => request.requestId),
+    );
+    const extraRequests = guestHouse.requests.filter(
+      (request) => !formRequestIds.has(request.requestId),
+    );
+
+    return {
+      ...guestHouse,
+      requests: [...extraRequests, ...mergedFormRequests],
+    };
+  }),
+});
+
+const seedBookingData = mergeBookingRequestForms(guestHouseData);
 
 const buildPaymentModeLookup = (data) =>
   Object.fromEntries(
@@ -21,7 +198,7 @@ const buildPaymentModeLookup = (data) =>
     ),
   );
 
-const PAYMENT_MODE_LOOKUP = buildPaymentModeLookup(guestHouseData);
+const PAYMENT_MODE_LOOKUP = buildPaymentModeLookup(seedBookingData);
 
 const hydratePaymentModes = (data) => ({
   ...data,
@@ -37,20 +214,75 @@ const hydratePaymentModes = (data) => ({
   })),
 });
 
+const hydrateBookingData = (data) =>
+  hydratePaymentModes(mergeBookingRequestForms(data));
+
+const getTodayDateString = () => new Date().toISOString().slice(0, 10);
+
+const getNextRequestId = (guestHouse, requestPrefix) => {
+  const nextSequence =
+    Math.max(
+      0,
+      ...guestHouse.requests
+        .map((request) => request.requestId)
+        .filter((requestId) => requestId?.startsWith(requestPrefix))
+        .map((requestId) => Number(requestId.replace(requestPrefix, "")))
+        .filter(Number.isFinite),
+    ) + 1;
+
+  return `${requestPrefix}${nextSequence}`;
+};
+
+const buildBookingRequestFromApplication = (formValues, requestId) => ({
+  requestId,
+  bookingId: requestId,
+  applicantName: formValues.applicantName,
+  bookingType: formValues.bookingType,
+  roomType: formValues.roomType,
+  numberOfGuests: String(formValues.accompanyingPersons.length + 1),
+  employeeId: formValues.employeeId,
+  department: formValues.applicantDepartment,
+  designation: formValues.applicantDesignation,
+  email: formValues.emailId,
+  phone: formValues.applicantMobileNumber,
+  stayLocation: formValues.guestHouseName,
+  checkIn: formValues.arrivalDate,
+  checkOut: formValues.departureDate,
+  arrivalTime: formValues.arrivalTime,
+  departureTime: formValues.departureTime,
+  purpose: formValues.visitPurpose,
+  submittedOn: getTodayDateString(),
+  status: "Pending",
+  assignedRoom: "",
+  assignedRooms: [],
+  allottedCheckIn: "",
+  allottedCheckOut: "",
+  guestName: formValues.guestName,
+  guestMobileNumber: formValues.guestMobileNumber,
+  guestDesignation: formValues.guestDesignation,
+  guestOrganization: "",
+  guestAddress: formValues.guestAddress,
+  accompanyingPersons: formValues.accompanyingPersons,
+  modeOfPayment: formValues.paymentMode,
+});
+
 function App() {
+  const [isBookingFormOpen, setIsBookingFormOpen] = useState(false);
+  const [bookingFormNotice, setBookingFormNotice] = useState(null);
+  const [focusedRequest, setFocusedRequest] = useState(null);
   const [bookingData, setBookingData] = useState(() => {
     const savedBookingData = window.localStorage.getItem(
       BOOKING_DATA_STORAGE_KEY,
     );
 
     if (!savedBookingData) {
-      return hydratePaymentModes(guestHouseData);
+      return hydrateBookingData(seedBookingData);
     }
 
     try {
-      return hydratePaymentModes(JSON.parse(savedBookingData));
+      return hydrateBookingData(JSON.parse(savedBookingData));
     } catch (error) {
-      return hydratePaymentModes(guestHouseData);
+      return hydrateBookingData(seedBookingData);
     }
   });
 
@@ -188,6 +420,46 @@ function App() {
     return updateResult;
   };
 
+  const handleCreateBookingRequest = (formValues) => {
+    const config = getFormConfigForGuestHouse(formValues.guestHouseName);
+    const targetGuestHouse = bookingData.guestHouses.find(
+      (guestHouse) => guestHouse.name === formValues.guestHouseName,
+    );
+
+    if (!config || !targetGuestHouse) {
+      return;
+    }
+
+    const requestId = getNextRequestId(targetGuestHouse, config.requestPrefix);
+
+    setBookingData((currentData) => ({
+      ...currentData,
+      guestHouses: currentData.guestHouses.map((guestHouse) => {
+        if (guestHouse.name !== formValues.guestHouseName) {
+          return guestHouse;
+        }
+
+        return {
+          ...guestHouse,
+          requests: [
+            buildBookingRequestFromApplication(formValues, requestId),
+            ...guestHouse.requests,
+          ],
+        };
+      }),
+    }));
+
+    setIsBookingFormOpen(false);
+    setBookingFormNotice({
+      guestHouseName: formValues.guestHouseName,
+      requestId,
+    });
+    setFocusedRequest({
+      guestHouseName: formValues.guestHouseName,
+      requestId,
+    });
+  };
+
   return (
     <div className="app-shell">
       <header className="app-top-header">
@@ -217,17 +489,53 @@ function App() {
             </a>
           </nav>
 
-          <a className="app-top-header__cta" href="#booking-requests">
+          <button
+            className="app-top-header__cta"
+            onClick={() => {
+              setBookingFormNotice(null);
+              setIsBookingFormOpen(true);
+            }}
+            type="button"
+          >
             Book Now
-          </a>
+          </button>
         </div>
       </header>
 
-      <main className="app-main">
-        <AdminPage
-          bookingData={bookingData}
-          onUpdateRequest={handleUpdateRequest}
-        />
+      <main
+        className={`app-main ${isBookingFormOpen ? "app-main-form-view" : ""}`}
+      >
+        {isBookingFormOpen ? (
+          <section className="booking-form-full-page">
+            <ApplicationStayForm
+              mode="edit"
+              onCancel={() => setIsBookingFormOpen(false)}
+              onSubmit={handleCreateBookingRequest}
+            />
+          </section>
+        ) : (
+          <>
+            {bookingFormNotice ? (
+              <Message
+                positive
+                className="booking-request-notice"
+                onDismiss={() => setBookingFormNotice(null)}
+              >
+                <Message.Header>Request Submitted</Message.Header>
+                <p>
+                  <strong>Booking ID:</strong> {bookingFormNotice.requestId}.
+                  Your request has been added at the top of{" "}
+                  {bookingFormNotice.guestHouseName}.
+                </p>
+              </Message>
+            ) : null}
+            <AdminPage
+              bookingData={bookingData}
+              focusedRequest={focusedRequest}
+              onUpdateRequest={handleUpdateRequest}
+            />
+          </>
+        )}
       </main>
 
       {/* <footer className="app-footer">

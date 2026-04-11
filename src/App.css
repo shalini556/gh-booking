@@ -127,9 +127,12 @@
 
 .app-top-header__cta,
 .semantic-hero-button.primary {
+  border: 0;
+  border-radius: 8px;
   color: #ffffff;
   background: linear-gradient(135deg, var(--portal-green) 0%, #3d947d 100%);
   box-shadow: 0 10px 18px rgba(45, 125, 104, 0.2);
+  cursor: pointer;
 }
 
 .app-top-header__cta:hover,
@@ -145,6 +148,21 @@
   padding: 5px;
   overflow: hidden;
   min-height: 0;
+}
+
+.app-main-form-view {
+  overflow: auto;
+  padding: 18px;
+}
+
+.booking-form-full-page {
+  width: min(1120px, 100%);
+  margin: 0 auto;
+}
+
+.booking-request-notice.ui.message {
+  margin: 0 0 8px;
+  border-radius: 8px;
 }
 
 .app-footer {
@@ -464,7 +482,7 @@
   line-height: 1.2;
 }
 
-.semantic-inline-filter.ui.form,
+.semantic-inline-filter,
 .semantic-filter-form.ui.form {
   margin: 0;
 }
@@ -618,7 +636,7 @@
   padding: 6px 8px;
   background: #edf4f1;
   color: var(--portal-navy);
-  font-size: 0.7rem;
+  font-size: 0.9rem;
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -705,7 +723,7 @@
 .semantic-table-wrap .ui.table tbody td {
   padding: 5px 8px;
   color: var(--portal-text);
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   border-color: #e5ece9;
   white-space: nowrap;
   overflow: hidden;
@@ -1082,6 +1100,72 @@
   padding: 0.45em 0.75em;
 }
 
+.application-form-shell {
+  margin: 0;
+}
+
+.application-form-page {
+  padding: 0;
+  background: transparent;
+  color: var(--portal-text);
+}
+
+.application-form-page .application-form-title.ui.header {
+  margin: 0 0 16px;
+  color: var(--portal-navy);
+  letter-spacing: 0;
+}
+
+.application-form-page .ui.segments {
+  border-radius: 8px;
+  box-shadow: 0 14px 30px rgba(36, 78, 66, 0.1);
+}
+
+.application-form-page .ui.segment {
+  padding: 18px;
+}
+
+.application-form-page .ui.header {
+  color: var(--portal-navy);
+  letter-spacing: 0;
+}
+
+.application-form-checkbox-group.ui.inline.fields,
+.application-form-payment.ui.grouped.fields {
+  margin-bottom: 0;
+}
+
+.application-form-checkbox-group.ui.inline.fields > label,
+.application-form-payment.ui.grouped.fields > label,
+.application-form-page .field > label {
+  color: var(--portal-navy);
+}
+
+.application-form-checkbox-group.ui.inline.fields {
+  align-items: center;
+  column-gap: 18px;
+  row-gap: 8px;
+}
+
+.application-form-checkbox-group.ui.inline.fields .field {
+  margin-right: 18px;
+}
+
+.application-form-repeat-list .fields {
+  margin-bottom: 0.75em;
+}
+
+.application-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.application-form-actions .ui.button {
+  border-radius: 8px;
+}
+
 .semantic-compact-modal > .actions {
   padding: 0.75rem 1rem;
 }
@@ -1139,7 +1223,7 @@
 /* Col 5: No. of Guests */
 .semantic-table-wrap .ui.table.semantic-booking-table thead th:nth-child(5),
 .semantic-table-wrap .ui.table.semantic-booking-table tbody td:nth-child(5) {
-  width: 6%;
+  width: 7%;
 }
 
 /* Col 6: Start Date */

@@ -15,8 +15,8 @@ import {
 } from "semantic-ui-react";
 import { getAvailableRooms } from "../utils/roomAllotment";
 
-function AdminPage({ bookingData, onUpdateRequest }) {
-  const rowsPerPage = 10;
+function AdminPage({ bookingData, focusedRequest, onUpdateRequest }) {
+  const rowsPerPage = 15;
   const [selectedGuestHouseName, setSelectedGuestHouseName] = useState("");
   const [adminError, setAdminError] = useState("");
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
@@ -204,22 +204,22 @@ function AdminPage({ bookingData, onUpdateRequest }) {
         let aValue = a[sortConfig.key];
         let bValue = b[sortConfig.key];
 
-                        if (sortConfig.key === "assignedRoom") {
-                          aValue = getAssignedRoomLabel(a);
-                          bValue = getAssignedRoomLabel(b);
-                        } else if (sortConfig.key === "guestHouseName") {
-                          aValue = a.guestHouseName || "";
-                          bValue = b.guestHouseName || "";
-                        } else if (sortConfig.key === "bookingType") {
-                          aValue = getDisplayBookingType(a.bookingType) || "";
-                          bValue = getDisplayBookingType(b.bookingType) || "";
-                        } else if (sortConfig.key === "roomType") {
-                          aValue = getDisplayRoomType(a.roomType) || "";
-                          bValue = getDisplayRoomType(b.roomType) || "";
-                        } else {
-                          aValue = aValue || "";
-                          bValue = bValue || "";
-                        }
+        if (sortConfig.key === "assignedRoom") {
+          aValue = getAssignedRoomLabel(a);
+          bValue = getAssignedRoomLabel(b);
+        } else if (sortConfig.key === "guestHouseName") {
+          aValue = a.guestHouseName || "";
+          bValue = b.guestHouseName || "";
+        } else if (sortConfig.key === "bookingType") {
+          aValue = getDisplayBookingType(a.bookingType) || "";
+          bValue = getDisplayBookingType(b.bookingType) || "";
+        } else if (sortConfig.key === "roomType") {
+          aValue = getDisplayRoomType(a.roomType) || "";
+          bValue = getDisplayRoomType(b.roomType) || "";
+        } else {
+          aValue = aValue || "";
+          bValue = bValue || "";
+        }
 
         if (aValue < bValue) {
           return sortConfig.direction === "ascending" ? -1 : 1;
@@ -360,6 +360,24 @@ function AdminPage({ bookingData, onUpdateRequest }) {
   }, [selectedGuestHouseName, closeAllFilters]);
 
   useEffect(() => {
+    if (!focusedRequest?.guestHouseName) {
+      return;
+    }
+
+    setSelectedGuestHouseName(focusedRequest.guestHouseName);
+    setSelectedRequestId(focusedRequest.requestId || "");
+    setActivePage(1);
+    setStartDateFrom("");
+    setStartDateTo("");
+    setEndDateFrom("");
+    setEndDateTo("");
+    setSelectedStatuses([]);
+    setSelectedTypes([]);
+    setSortConfig({ key: null, direction: null });
+    closeAllFilters();
+  }, [closeAllFilters, focusedRequest]);
+
+  useEffect(() => {
     if (activePage > totalPages) {
       setActivePage(totalPages);
     }
@@ -443,7 +461,10 @@ function AdminPage({ bookingData, onUpdateRequest }) {
           label: "Mode of Payment",
           value: getDisplayPaymentMode(selectedRequest.modeOfPayment),
         },
-        { label: "Room Type", value: getDisplayRoomType(selectedRequest.roomType) },
+        {
+          label: "Room Type",
+          value: getDisplayRoomType(selectedRequest.roomType),
+        },
         { label: "Guests", value: selectedRequest.numberOfGuests },
         {
           label:
@@ -513,47 +534,8 @@ function AdminPage({ bookingData, onUpdateRequest }) {
               <div className="semantic-section-head">
                 <div>
                   <p className="semantic-panel-kicker">Booking Requests</p>
-                  {/* <Header as="h2" className="semantic-section-title">
-                    {selectedGuestHouseFilter
-                      ? `${selectedGuestHouseFilter.name} Booking Requests`  
-                      : "All Booking Requests"}
-                  </Header>
-                  <p className="semantic-section-copy">
-                    Select a request to review applicant details and update booking status.
-                  </p> */}
                 </div>
               </div>
-
-              {/* <Form className="semantic-filter-form">
-                <Form.Group widths="equal">
-                  <Form.Input
-                    icon="search"
-                    iconPosition="left"
-                    label="Booking ID"
-                    placeholder="Search booking ID"
-                    value={bookingIdFilter}
-                    onChange={(event) => setBookingIdFilter(event.target.value)}
-                  />
-                  <Form.Select
-                    label="Booking Type"
-                    options={[
-                      { key: "all-type", text: "Booking Type", value: "" },
-                      ...bookingTypeOptions,
-                    ]}
-                    value={bookingTypeFilter}
-                    onChange={(_, data) => setBookingTypeFilter(data.value)}
-                  />
-                  <Form.Select
-                    label="Status"
-                    options={[
-                      { key: "all-status", text: "Status", value: "" },
-                      ...statusSelectOptions,
-                    ]}
-                    value={statusFilter}
-                    onChange={(_, data) => setStatusFilter(data.value)}
-                  />
-                </Form.Group>
-              </Form> */}
 
               {!hasSelectedGuestHouse ? (
                 <div className="semantic-table-empty-state" role="status">

@@ -1,0 +1,96 @@
+{
+  "header": {
+    "title": "APPLICATION FOR THE STAY IN THE LAKSHMAN DAS / UNIVERSITY GUEST HOUSE"
+  },
+  "guestHouseOptions": [
+    {
+      "label": "L.D.",
+      "guestHouseName": "LD Guest House"
+    },
+    {
+      "label": "L.D. Ext.",
+      "guestHouseName": "Faculty Guest House"
+    },
+    {
+      "label": "S.S.B.",
+      "guestHouseName": "SSB Guest House"
+    },
+    {
+      "label": "U.G.H.",
+      "guestHouseName": "University Guest House"
+    }
+  ],
+  "guestFields": [
+    {
+      "number": "1",
+      "key": "guestName",
+      "label": "Name of the Guest (In Block letters)"
+    },
+    {
+      "number": "2",
+      "key": "guestAddressLine",
+      "label": "Designation, full address & Mobile Number"
+    },
+    {
+      "number": "3",
+      "key": "accompanyingPersons",
+      "label": "Name(s) of person(s) accompanying the Guest and relationship with the Guest"
+    },
+    {
+      "number": "4",
+      "key": "roomCount",
+      "label": "Number of Room(s)"
+    },
+    {
+      "number": "5",
+      "key": "visitPurpose",
+      "label": "Purpose of visit (Attach proof in case of Official)"
+    }
+  ],
+  "stayFields": [
+    {
+      "key": "arrivalDate",
+      "label": "Arrival Date"
+    },
+    {
+      "key": "arrivalTime",
+      "label": "Arrival Time"
+    },
+    {
+      "key": "departureDate",
+      "label": "Departure Date"
+    },
+    {
+      "key": "departureTime",
+      "label": "Departure Time"
+    },
+    {
+      "key": "numberOfDays",
+      "label": "No. of Days"
+    }
+  ],
+  "applicantFields": [
+    {
+      "key": "applicantNameAndEmployeeId",
+      "label": "Name & E.ID. No."
+    },
+    {
+      "key": "applicantDesignationDepartment",
+      "label": "Designation & Department"
+    },
+    {
+      "key": "applicantMobileNumber",
+      "label": "Mobile No."
+    },
+    {
+      "key": "emailId",
+      "label": "E-Mail ID"
+    }
+  ],
+  "paymentModes": [
+    "By Guest",
+    "By Applicant",
+    "University A/C",
+    "Special Fund/Project A/C"
+  ]
+}
