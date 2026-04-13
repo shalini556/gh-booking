@@ -1166,6 +1166,459 @@
   border-radius: 8px;
 }
 
+.app-main-form-view {
+  padding: 8px 10px;
+}
+
+.booking-form-full-page {
+  width: 100%;
+  max-width: none;
+}
+
+.application-form-shell {
+  height: 100%;
+}
+
+.application-form-page.ui.form {
+  display: flex;
+  min-height: 0;
+  height: 100%;
+  flex-direction: column;
+}
+
+.compact-header-wrap {
+  margin-bottom: 4px;
+}
+
+.compact-form-heading.ui.header {
+  margin: 0;
+  color: var(--portal-navy);
+  font-size: 1.05rem;
+  line-height: 1.15;
+}
+
+.compact-grid-layout {
+  display: grid;
+  flex: 1;
+  min-height: 0;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: stretch;
+}
+
+.application-form-page .application-section.semantic-panel {
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--portal-border);
+  border-radius: 8px;
+  box-shadow: var(--portal-shadow-soft);
+  overflow: hidden;
+}
+
+.application-form-page .semantic-panel-kicker {
+  margin-bottom: 3px;
+  color: var(--portal-green);
+  font-size: 0.64rem;
+  line-height: 1;
+  letter-spacing: 0.22em;
+}
+
+.application-form-page .semantic-section-title.ui.header {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0 0 6px;
+  color: var(--portal-navy);
+  font-size: 0.98rem;
+  line-height: 1.1;
+}
+
+.application-form-page .semantic-section-title.ui.header .icon {
+  width: auto;
+  margin: 0;
+  color: var(--portal-navy);
+  font-size: 1rem;
+}
+
+.application-form-page.ui.form .field {
+  margin: 0;
+}
+
+.application-form-page.ui.form .field > label,
+.application-form-page.ui.form .fields > label {
+  margin: 0 0 3px;
+  color: var(--portal-text);
+  font-size: 0.74rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.application-form-page.ui.form input,
+.application-form-page.ui.form .ui.input > input,
+.application-form-page.ui.form .ui.selection.dropdown {
+  min-height: 32px;
+  height: 32px;
+  padding-top: 6px;
+  padding-bottom: 6px;
+  border-radius: 6px;
+  font-size: 0.84rem;
+  line-height: 1.15;
+}
+
+.application-form-page.ui.form .ui.selection.dropdown {
+  padding-top: 0.58em;
+  padding-bottom: 0.58em;
+}
+
+.selection-section {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  position: relative;
+  z-index: 20;
+}
+
+.application-form-page .selection-section.semantic-panel {
+  overflow: visible;
+}
+
+.guest-section {
+  grid-column: 1 / span 8;
+  grid-row: 3 / span 3;
+  position: relative;
+  z-index: 1;
+}
+
+.stay-section {
+  grid-column: 9 / -1;
+  grid-row: 3;
+}
+
+.applicant-section {
+  grid-column: 1 / -1;
+  grid-row: 1;
+}
+
+.payment-section {
+  grid-column: 9 / -1;
+  grid-row: 4;
+}
+
+.selection-control-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 0.42fr);
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.application-form-checkbox-group.ui.inline.fields,
+.application-payment-row.ui.inline.fields,
+.application-compact-fields.fields {
+  margin: 0;
+  gap: 8px;
+}
+
+.application-form-checkbox-group.ui.inline.fields {
+  align-items: center;
+  min-height: 32px;
+}
+
+.application-form-checkbox-group.ui.inline.fields > label {
+  margin: 0 8px 0 0;
+  font-size: 0.78rem;
+}
+
+.application-form-checkbox-group.ui.inline.fields .field,
+.application-payment-row.ui.inline.fields .field {
+  margin: 0 10px 0 0;
+}
+
+.application-form-page .ui.checkbox label {
+  color: var(--portal-text);
+  font-size: 0.82rem;
+  line-height: 1.2;
+}
+
+.guest-house-preference-list > label {
+  display: block;
+  margin: 0 0 4px;
+  color: var(--portal-navy);
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+
+.guest-house-preference-list {
+  min-width: 0;
+}
+
+.guest-house-preference-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.guest-house-preference-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 2px;
+  min-height: 28px;
+  padding: 3px 5px;
+  border: 1px solid var(--portal-border);
+  border-radius: 6px;
+  background: #fbfdfc;
+}
+
+.guest-house-preference-card.is-selected {
+  border-color: rgba(45, 125, 104, 0.42);
+  background: var(--portal-green-soft);
+}
+
+.guest-house-preference-card .ui.checkbox label {
+  padding-left: 1.3em;
+  font-size: 0.72rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.preference-rank {
+  color: var(--portal-green);
+  font-size: 0.54rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.selection-dropdown-group.fields {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: flex-end;
+  gap: 8px;
+  margin: 0 !important;
+}
+
+.selection-dropdown-group.fields .field {
+  min-width: 0;
+  width: auto !important;
+  padding: 0 !important;
+}
+
+.selection-dropdown-group.fields .field > label {
+  color: var(--portal-navy);
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+
+.application-form-page.ui.form
+  .selection-dropdown-group
+  .ui.selection.dropdown {
+  min-height: 32px;
+  height: 32px;
+  padding: 0.56em 2em 0.56em 0.78em;
+  border-color: rgba(20, 58, 90, 0.18);
+  border-radius: 6px;
+  background: linear-gradient(180deg, #ffffff 0%, #f6faf8 100%);
+  color: var(--portal-text);
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.application-form-page.ui.form
+  .selection-dropdown-group
+  .ui.selection.dropdown:focus,
+.application-form-page.ui.form
+  .selection-dropdown-group
+  .ui.selection.active.dropdown {
+  border-color: rgba(45, 125, 104, 0.58);
+  box-shadow: 0 0 0 2px rgba(45, 125, 104, 0.1);
+}
+
+.application-form-page.ui.form
+  .selection-dropdown-group
+  .ui.selection.dropdown
+  .menu {
+  z-index: 1000;
+  border: 1px solid rgba(45, 125, 104, 0.32);
+  border-radius: 0 0 6px 6px;
+  box-shadow: 0 12px 22px rgba(13, 42, 66, 0.14);
+}
+
+.application-form-grid {
+  display: grid;
+  gap: 8px;
+}
+
+.guest-detail-grid {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.applicant-detail-grid {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+
+.span-2 {
+  grid-column: span 2;
+}
+
+.span-full {
+  grid-column: 1 / -1;
+}
+
+.stay-duration-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr) minmax(0, 1fr) minmax(0, 0.9fr) 72px;
+  gap: 8px;
+  align-items: end;
+}
+
+.days-badge {
+  height: 32px;
+  padding: 0 10px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+.application-form-repeat-list {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.application-form-repeat-list .fields,
+.application-form-repeat-list .field {
+  margin: 0;
+}
+
+.accompanying-person-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.accompanying-person-head label {
+  margin: 0;
+  color: var(--portal-navy);
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+
+.accompanying-person-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 28px;
+  align-items: center;
+  gap: 5px;
+}
+
+.accompanying-remove-button.ui.button {
+  min-height: 26px;
+  width: 28px;
+  margin: 0;
+  padding: 0;
+  border-radius: 6px;
+}
+
+.accompanying-add-button.ui.button {
+  min-height: 28px;
+  width: auto;
+  margin: 0;
+  padding: 0 10px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+.accompanying-remove-button.ui.button .icon {
+  margin: 0;
+}
+
+.application-payment-row.ui.inline.fields {
+  align-items: center;
+  min-height: 34px;
+  flex-wrap: wrap;
+  row-gap: 6px;
+}
+
+.application-form-actions {
+  grid-column: 9 / -1;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+}
+
+.application-form-actions .ui.button,
+.application-form-actions .semantic-hero-button {
+  min-height: 34px;
+  padding: 0 16px;
+  border-radius: 8px;
+  font-size: 0.86rem;
+}
+
+@media (max-width: 1180px) {
+  .compact-grid-layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: none;
+  }
+
+  .selection-section,
+  .guest-section,
+  .stay-section,
+  .applicant-section,
+  .payment-section,
+  .application-form-actions {
+    grid-column: 1;
+    grid-row: auto;
+  }
+
+  .selection-control-row {
+    grid-template-columns: 1fr;
+  }
+
+  .guest-house-preference-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .applicant-detail-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .app-main-form-view {
+    padding: 8px;
+  }
+
+  .guest-detail-grid,
+  .applicant-detail-grid,
+  .stay-duration-grid,
+  .application-form-repeat-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .span-2,
+  .span-full {
+    grid-column: 1 / -1;
+  }
+
+  .application-form-actions {
+    position: sticky;
+    bottom: 0;
+    padding-top: 8px;
+    background: var(--portal-bg);
+  }
+
+  .application-form-actions .ui.button {
+    flex: 1;
+  }
+
+  .guest-house-preference-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .semantic-compact-modal > .actions {
   padding: 0.75rem 1rem;
 }

@@ -246,6 +246,9 @@ const buildBookingRequestFromApplication = (formValues, requestId) => ({
   email: formValues.emailId,
   phone: formValues.applicantMobileNumber,
   stayLocation: formValues.guestHouseName,
+  guestHousePreferences: formValues.guestHousePreferences?.length
+    ? formValues.guestHousePreferences
+    : [formValues.guestHouseName],
   checkIn: formValues.arrivalDate,
   checkOut: formValues.departureDate,
   arrivalTime: formValues.arrivalTime,

@@ -2,11 +2,10 @@ import { useEffect, useMemo, useState } from "react";
 import {
   Button,
   Checkbox,
-  Divider,
   Form,
   Header,
+  Icon,
   Input,
-  Segment,
   Select,
 } from "semantic-ui-react";
 import formData from "../data/applicationFormData.json";
@@ -41,21 +40,24 @@ const getStayDaysFromDates = (checkInDate, checkOutDate) => {
 };
 
 const normalizeAccompanyingPersons = (persons = []) => {
-  const normalizedPersons = persons.slice(0, 3).map((person) => ({
-    name: person.name || "",
-    relationship: person.relationship || "",
-  }));
+  const normalizedPersons = persons
+    .filter((person) => person.name || person.relationship)
+    .map((person) => ({
+      name: person.name || "",
+      relationship: "",
+    }));
 
-  while (normalizedPersons.length < 3) {
-    normalizedPersons.push({ name: "", relationship: "" });
-  }
-
-  return normalizedPersons;
+  return normalizedPersons.length
+    ? normalizedPersons
+    : [{ name: "", relationship: "" }];
 };
 
 const getFormValuesFromRequest = (request = {}) => ({
   guestHouseName:
     request.guestHouseName || formData.guestHouseOptions[0].guestHouseName,
+  guestHousePreferences: request.guestHousePreferences?.length
+    ? request.guestHousePreferences
+    : [request.guestHouseName || formData.guestHouseOptions[0].guestHouseName],
   guestName: request.guestName || "",
   guestDesignation: request.guestDesignation || "",
   guestAddress: request.guestAddress || "",
@@ -87,19 +89,6 @@ const getFormValuesFromRequest = (request = {}) => ({
   bookingType: request.bookingType || "Other",
   roomType: request.roomType || "single",
 });
-
-const getGuestAddressLine = (values) =>
-  [values.guestDesignation, values.guestAddress, values.guestMobileNumber]
-    .filter(Boolean)
-    .join(" | ");
-
-const getApplicantNameAndEmployeeId = (values) =>
-  [values.applicantName, values.employeeId].filter(Boolean).join(" | ");
-
-const getApplicantDesignationDepartment = (values) =>
-  [values.applicantDesignation, values.applicantDepartment]
-    .filter(Boolean)
-    .join(" | ");
 
 function ApplicationStayForm({
   mode = "readonly",
@@ -153,6 +142,45 @@ function ApplicationStayForm({
     }));
   };
 
+  const addAccompanyingPerson = () => {
+    setValues((currentValues) => ({
+      ...currentValues,
+      accompanyingPersons: [
+        ...currentValues.accompanyingPersons,
+        { name: "", relationship: "" },
+      ],
+    }));
+  };
+
+  const removeAccompanyingPerson = (index) => {
+    setValues((currentValues) => ({
+      ...currentValues,
+      accompanyingPersons:
+        currentValues.accompanyingPersons.length > 1
+          ? currentValues.accompanyingPersons.filter(
+              (_, personIndex) => personIndex !== index,
+            )
+          : [{ name: "", relationship: "" }],
+    }));
+  };
+
+  const updateGuestHousePreference = (guestHouseName, isSelected) => {
+    setValues((currentValues) => {
+      const currentPreferences = currentValues.guestHousePreferences || [];
+      const nextPreferences = isSelected
+        ? [...currentPreferences, guestHouseName]
+        : currentPreferences.filter((item) => item !== guestHouseName);
+      const fallbackGuestHouse =
+        nextPreferences[0] || formData.guestHouseOptions[0].guestHouseName;
+
+      return {
+        ...currentValues,
+        guestHouseName: fallbackGuestHouse,
+        guestHousePreferences: nextPreferences,
+      };
+    });
+  };
+
   const getInputProps = (key, options = {}) => ({
     ...options,
     fluid: true,
@@ -180,164 +208,228 @@ function ApplicationStayForm({
       aria-label={formData.header.title}
     >
       <Form className="application-form-page" onSubmit={handleSubmit}>
-        <Header as="h2" dividing className="application-form-title">
-          {formData.header.title}
-          <Header.Subheader>
-            Complete the booking details below.
-          </Header.Subheader>
-        </Header>
+        <div className="compact-header-wrap">
+          <Header as="h3" className="compact-form-heading">
+            Guest house application form
+          </Header>
+        </div>
 
-        <Segment.Group raised>
-          <Segment>
-            <Form.Group inline className="application-form-checkbox-group">
-              <label>Guest House</label>
-              {formData.guestHouseOptions.map((option) => (
-                <Form.Field
-                  checked={values.guestHouseName === option.guestHouseName}
-                  control={Checkbox}
-                  disabled={!isEditable}
-                  key={option.label}
-                  label={option.label}
-                  name="guestHouseName"
-                  onChange={() =>
-                    updateValue("guestHouseName", option.guestHouseName)
-                  }
-                />
-              ))}
-            </Form.Group>
+        <div className="compact-grid-layout">
+          <div className="semantic-panel application-section applicant-section">
+            {/* <div className="semantic-panel-kicker">Identity</div> */}
+            <Header as="h3" className="semantic-section-title">
+              <Icon name="id card" />
+              Applicant Details
+            </Header>
 
-            <Form.Group widths="equal">
-              <Form.Field
-                control={Select}
-                disabled={!isEditable}
-                label="Booking Type"
-                onChange={(_, data) => updateValue("bookingType", data.value)}
-                options={bookingTypeOptions}
-                value={values.bookingType}
-              />
-              <Form.Field
-                control={Select}
-                disabled={!isEditable}
-                label="Room Type"
-                onChange={(_, data) => updateValue("roomType", data.value)}
-                options={roomTypeOptions}
-                value={values.roomType}
-              />
-            </Form.Group>
-          </Segment>
-
-          <Segment>
-            <Header as="h4">Guest Details</Header>
-            <Form.Field required={isEditable}>
-              <label>Name of the Guest</label>
-              <Input {...getInputProps("guestName")} />
-            </Form.Field>
-
-            {isEditable ? (
-              <Form.Group widths="equal">
-                <Form.Field required>
-                  <label>Guest Designation</label>
-                  <Input
-                    {...getInputProps("guestDesignation", {
-                      placeholder: "Guest designation",
-                    })}
-                  />
-                </Form.Field>
-                <Form.Field required>
-                  <label>Full Address</label>
-                  <Input
-                    {...getInputProps("guestAddress", {
-                      placeholder: "Full address",
-                    })}
-                  />
-                </Form.Field>
-                <Form.Field required>
-                  <label>Guest Mobile Number</label>
-                  <Input
-                    {...getInputProps("guestMobileNumber", {
-                      placeholder: "Mobile number",
-                    })}
-                  />
-                </Form.Field>
-              </Form.Group>
-            ) : (
-              <Form.Field>
-                <label>Designation, Address & Mobile Number</label>
-                <Input fluid readOnly value={getGuestAddressLine(values)} />
+            <div className="application-form-grid applicant-detail-grid">
+              <Form.Field required>
+                <label>Emp ID</label>
+                <Input {...getInputProps("employeeId")} />
               </Form.Field>
-            )}
 
-            <Form.Field>
-              <label>Accompanying Persons</label>
-              <div className="application-form-repeat-list">
-                {values.accompanyingPersons.map((person, index) =>
-                  isEditable ? (
-                    <Form.Group widths="equal" key={index}>
-                      <Form.Field>
-                        <Input
-                          fluid
-                          label={`${index + 1}`}
-                          onChange={(event) =>
-                            updateAccompanyingPerson(
-                              index,
-                              "name",
-                              event.target.value,
+              <Form.Field required>
+                <label>Name</label>
+                <Input {...getInputProps("applicantName")} />
+              </Form.Field>
+
+              <Form.Field required>
+                <label>Designation</label>
+                <Input {...getInputProps("applicantDesignation")} />
+              </Form.Field>
+              <Form.Field required>
+                <label>Dept</label>
+                <Input {...getInputProps("applicantDepartment")} />
+              </Form.Field>
+              <Form.Field required>
+                <label>Mobile</label>
+                <Input {...getInputProps("applicantMobileNumber")} />
+              </Form.Field>
+              <Form.Field required={isEditable}>
+                <label>Email</label>
+                <Input {...getInputProps("emailId", { type: "email" })} />
+              </Form.Field>
+            </div>
+          </div>
+
+          <div className="semantic-panel application-section selection-section">
+            {/* <div className="semantic-panel-kicker">Selection</div> */}
+            {/* <Header as="h3" className="semantic-section-title">
+                <Icon name="building" />
+                  Guest House & Type
+              </Header> */}
+
+            <div className="selection-control-row">
+              <div className="guest-house-preference-list">
+                <label>Guest House Preference</label>
+                <div className="guest-house-preference-grid">
+                  {formData.guestHouseOptions.map((option) => {
+                    const preferenceIndex = (
+                      values.guestHousePreferences || []
+                    ).indexOf(option.guestHouseName);
+                    const isSelected = preferenceIndex >= 0;
+
+                    return (
+                      <div
+                        className={`guest-house-preference-card ${
+                          isSelected ? "is-selected" : ""
+                        }`}
+                        key={option.label}
+                      >
+                        <Checkbox
+                          checked={isSelected}
+                          disabled={!isEditable}
+                          label={option.label}
+                          onChange={(_, data) =>
+                            updateGuestHousePreference(
+                              option.guestHouseName,
+                              Boolean(data.checked),
                             )
                           }
-                          placeholder="Name"
-                          value={person.name}
                         />
-                      </Form.Field>
-                      <Form.Field>
-                        <Input
-                          fluid
-                          onChange={(event) =>
-                            updateAccompanyingPerson(
-                              index,
-                              "relationship",
-                              event.target.value,
-                            )
-                          }
-                          placeholder="Relationship"
-                          value={person.relationship}
-                        />
-                      </Form.Field>
-                    </Form.Group>
-                  ) : (
-                    <Form.Field key={index}>
-                      <Input
-                        fluid
-                        label={`${index + 1}`}
-                        readOnly
-                        value={
-                          person.name
-                            ? `${person.name} - ${person.relationship || ""}`
-                            : ""
-                        }
-                      />
-                    </Form.Field>
-                  ),
-                )}
+                        <span className="preference-rank">
+                          {isSelected
+                            ? `Pref ${preferenceIndex + 1}`
+                            : "Optional"}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-            </Form.Field>
 
-            <Form.Group widths="equal">
+              <Form.Group
+                widths="equal"
+                className="application-compact-fields selection-dropdown-group"
+              >
+                <Form.Field
+                  control={Select}
+                  disabled={!isEditable}
+                  label="Booking Type"
+                  onChange={(_, data) => updateValue("bookingType", data.value)}
+                  options={bookingTypeOptions}
+                  value={values.bookingType}
+                />
+                <Form.Field
+                  control={Select}
+                  disabled={!isEditable}
+                  label="Room Type"
+                  onChange={(_, data) => updateValue("roomType", data.value)}
+                  options={roomTypeOptions}
+                  value={values.roomType}
+                />
+              </Form.Group>
+            </div>
+          </div>
+
+          <div className="semantic-panel application-section guest-section">
+            {/* <div className="semantic-panel-kicker">Guest</div> */}
+            <Header as="h3" className="semantic-section-title">
+              <Icon name="user" />
+              Guest Details
+            </Header>
+
+            <div className="application-form-grid guest-detail-grid">
+              <Form.Field required={isEditable} className="span-2">
+                <label>Name of the Guest</label>
+                <Input
+                  {...getInputProps("guestName", { placeholder: "Full name" })}
+                />
+              </Form.Field>
+
+              <Form.Field required={isEditable}>
+                <label>Designation</label>
+                <Input {...getInputProps("guestDesignation")} />
+              </Form.Field>
+              <Form.Field required={isEditable}>
+                <label>Mobile</label>
+                <Input {...getInputProps("guestMobileNumber")} />
+              </Form.Field>
+
+              <Form.Field required={isEditable} className="span-2">
+                <label>Full Address</label>
+                <Input {...getInputProps("guestAddress")} />
+              </Form.Field>
+
               <Form.Field>
-                <label>Number of Rooms</label>
+                <label>Rooms</label>
                 <Input
                   {...getInputProps("roomCount", { min: "1", type: "number" })}
                 />
               </Form.Field>
-              <Form.Field required={isEditable}>
-                <label>Purpose of Visit</label>
+              <Form.Field required={isEditable} className="span-2">
+                <label>Purpose</label>
                 <Input {...getInputProps("visitPurpose")} />
               </Form.Field>
-            </Form.Group>
-          </Segment>
 
-          <Segment>
-            <Header as="h4">Stay Details</Header>
-            <Form.Group widths="equal">
+              <Form.Field className="span-full">
+                <div className="accompanying-person-head">
+                  <label>Accompanying Persons</label>
+                  {isEditable ? (
+                    <Button
+                      basic
+                      compact
+                      className="accompanying-add-button"
+                      onClick={addAccompanyingPerson}
+                      type="button"
+                    >
+                      Add person +
+                    </Button>
+                  ) : null}
+                </div>
+                <div className="application-form-repeat-list">
+                  {values.accompanyingPersons.map((person, index) =>
+                    isEditable ? (
+                      <div className="accompanying-person-row" key={index}>
+                        <Form.Field>
+                          <Input
+                            fluid
+                            label={`${index + 1}`}
+                            onChange={(event) =>
+                              updateAccompanyingPerson(
+                                index,
+                                "name",
+                                event.target.value,
+                              )
+                            }
+                            placeholder="Name"
+                            value={person.name}
+                          />
+                        </Form.Field>
+                        <Button
+                          basic
+                          compact
+                          className="accompanying-remove-button"
+                          disabled={values.accompanyingPersons.length <= 1}
+                          icon="minus"
+                          onClick={() => removeAccompanyingPerson(index)}
+                          type="button"
+                        />
+                      </div>
+                    ) : (
+                      <Form.Field key={index}>
+                        <Input
+                          fluid
+                          label={`${index + 1}`}
+                          readOnly
+                          value={person.name || ""}
+                        />
+                      </Form.Field>
+                    ),
+                  )}
+                </div>
+              </Form.Field>
+            </div>
+          </div>
+
+          <div className="semantic-panel application-section stay-section">
+            {/* <div className="semantic-panel-kicker">Stay</div> */}
+            <Header as="h3" className="semantic-section-title">
+              <Icon name="calendar alternate" />
+              Stay Duration
+            </Header>
+
+            <div className="stay-duration-grid">
               <Form.Field>
                 <label>Arrival Date</label>
                 <Input
@@ -365,91 +457,20 @@ function ApplicationStayForm({
                 <Input {...getInputProps("departureTime", { type: "time" })} />
               </Form.Field>
               <Form.Field>
-                <label>No. of Days</label>
-                <Input fluid readOnly value={values.numberOfDays || ""} />
+                <label>Days</label>
+                <div className="days-badge">{values.numberOfDays || "0"}</div>
               </Form.Field>
-            </Form.Group>
-          </Segment>
+            </div>
+          </div>
 
-          <Segment>
-            <Header as="h4">Applicant Details</Header>
-            {isEditable ? (
-              <>
-                <Form.Group widths="equal">
-                  <Form.Field required>
-                    <label>Applicant Name</label>
-                    <Input
-                      {...getInputProps("applicantName", {
-                        placeholder: "Applicant name",
-                      })}
-                    />
-                  </Form.Field>
-                  <Form.Field required>
-                    <label>Employee ID</label>
-                    <Input
-                      {...getInputProps("employeeId", {
-                        placeholder: "Employee ID",
-                      })}
-                    />
-                  </Form.Field>
-                </Form.Group>
-                <Form.Group widths="equal">
-                  <Form.Field required>
-                    <label>Designation</label>
-                    <Input
-                      {...getInputProps("applicantDesignation", {
-                        placeholder: "Designation",
-                      })}
-                    />
-                  </Form.Field>
-                  <Form.Field required>
-                    <label>Department</label>
-                    <Input
-                      {...getInputProps("applicantDepartment", {
-                        placeholder: "Department",
-                      })}
-                    />
-                  </Form.Field>
-                </Form.Group>
-              </>
-            ) : (
-              <Form.Group widths="equal">
-                <Form.Field>
-                  <label>Name & E.ID. No.</label>
-                  <Input
-                    fluid
-                    readOnly
-                    value={getApplicantNameAndEmployeeId(values)}
-                  />
-                </Form.Field>
-                <Form.Field>
-                  <label>Designation & Department</label>
-                  <Input
-                    fluid
-                    readOnly
-                    value={getApplicantDesignationDepartment(values)}
-                  />
-                </Form.Field>
-              </Form.Group>
-            )}
+          <div className="semantic-panel application-section payment-section">
+            {/* <div className="semantic-panel-kicker">Payment</div> */}
+            <Header as="h3" className="semantic-section-title">
+              <Icon name="credit card" />
+              Payment Mode
+            </Header>
 
-            <Form.Group widths="equal">
-              <Form.Field required={isEditable}>
-                <label>Mobile No.</label>
-                <Input {...getInputProps("applicantMobileNumber")} />
-              </Form.Field>
-              <Form.Field required={isEditable}>
-                <label>E-Mail ID</label>
-                <Input {...getInputProps("emailId", { type: "email" })} />
-              </Form.Field>
-            </Form.Group>
-
-            <Divider />
-          </Segment>
-
-          <Segment>
-            <Form.Group grouped className="application-form-payment">
-              <label>Mode of Payment</label>
+            <Form.Group inline className="application-payment-row">
               {paymentModes.map((paymentMode) => (
                 <Form.Field
                   checked={paymentMode.checked}
@@ -463,19 +484,28 @@ function ApplicationStayForm({
                 />
               ))}
             </Form.Group>
-          </Segment>
-        </Segment.Group>
-
-        {isEditable ? (
-          <div className="application-form-actions">
-            <Button basic onClick={onCancel} type="button">
-              Cancel
-            </Button>
-            <Button color="green" primary type="submit">
-              {submitLabel}
-            </Button>
           </div>
-        ) : null}
+
+          {isEditable ? (
+            <div className="application-form-actions">
+              <Button
+                basic
+                onClick={onCancel}
+                type="button"
+                className="semantic-hero-button secondary"
+              >
+                Discard Changes
+              </Button>
+              <Button
+                primary
+                type="submit"
+                className="semantic-hero-button primary"
+              >
+                {submitLabel}
+              </Button>
+            </div>
+          ) : null}
+        </div>
       </Form>
     </section>
   );
