@@ -28,6 +28,197 @@ const roomTypeOptions = [
 const getSelectedPaymentMode = (paymentMode) =>
   paymentModeAliases[paymentMode] || paymentMode || "";
 
+const getPreviewValue = (value) => {
+  if (Array.isArray(value)) {
+    return value.length ? value.join(", ") : "-";
+  }
+
+  return value?.toString().trim() || "-";
+};
+
+const getBookingTypeLabel = (bookingType) =>
+  bookingType === "Other" ? "Official" : getPreviewValue(bookingType);
+
+const getRoomTypeLabel = (roomType) => {
+  const displayValue = getPreviewValue(roomType);
+
+  return displayValue === "-"
+    ? displayValue
+    : `${displayValue.charAt(0).toUpperCase()}${displayValue.slice(1)}`;
+};
+
+const getRoomPreferenceLabel = (roomType) => {
+  const roomTypeLabel = getRoomTypeLabel(roomType);
+
+  return roomTypeLabel === "-" ? "-" : `${roomTypeLabel} Room`;
+};
+
+const getPreviewPrintMarkup = (previewContent) => `
+  <!doctype html>
+  <html>
+    <head>
+      <title>University Guest House Booking Application Form</title>
+      <style>
+        @page {
+          size: A4;
+          margin: 8mm;
+        }
+
+        * {
+          box-sizing: border-box;
+        }
+
+        html,
+        body {
+          margin: 0;
+          padding: 0;
+          background: #ffffff;
+          color: #111111;
+          font-family: Arial, Helvetica, sans-serif;
+          font-size: 11px;
+          line-height: 1.35;
+        }
+
+        #booking-preview-content {
+          width: 100%;
+          margin: 0;
+          padding: 0 !important;
+          background: #ffffff;
+          color: #111111;
+        }
+
+        .d-flex {
+          display: flex;
+        }
+
+        .justify-content-between {
+          justify-content: space-between;
+        }
+
+        .align-items-start {
+          align-items: flex-start;
+        }
+
+        .align-items-center {
+          align-items: center;
+        }
+
+        .gap-2 {
+          gap: 8px;
+        }
+
+        .text-end {
+          text-align: right;
+        }
+
+        .text-muted {
+          color: #555555;
+        }
+
+        .text-navy {
+          color: #111111;
+        }
+
+        .fw-bold {
+          font-weight: 700;
+        }
+
+        .small {
+          font-size: 10px;
+        }
+
+        .d-block {
+          display: block;
+        }
+
+        .border-bottom {
+          border-bottom: 1px solid #d0d0d0;
+        }
+
+        .mb-5 {
+          margin-bottom: 12px !important;
+        }
+
+        .pb-4 {
+          padding-bottom: 8px !important;
+        }
+
+        .m-0 {
+          margin: 0 !important;
+        }
+
+        .section-label {
+          display: block;
+          margin: 0 0 4px;
+          color: #111111;
+          font-size: 9px;
+          font-weight: 800;
+          letter-spacing: 0.04em;
+          text-transform: uppercase;
+        }
+
+        h1.ui.header {
+          margin: 0;
+          font-size: 20px !important;
+          line-height: 1.15;
+        }
+
+        h4.ui.header {
+          margin: 2px 0 0;
+          font-size: 12px;
+          font-weight: 600;
+        }
+
+        .ui.grid {
+          display: block;
+          width: 100%;
+          margin: 0 !important;
+        }
+
+        .ui.grid > .row,
+        .row {
+          display: block;
+          width: 100%;
+          margin: 0;
+          padding: 9px 0 !important;
+          border-bottom: 1px solid #d9d9d9;
+          page-break-inside: avoid;
+        }
+
+        .ui.grid > .row:first-child,
+        .row:first-child {
+          padding-top: 0 !important;
+        }
+
+        .ui.grid > .row > .column,
+        .column {
+          width: 100% !important;
+          padding: 0 !important;
+        }
+
+        table {
+          width: 100%;
+          border-collapse: collapse;
+          page-break-inside: avoid;
+        }
+
+        td,
+        th {
+          padding: 2px 4px 2px 0;
+          vertical-align: top;
+          text-align: left;
+        }
+
+        td:first-child,
+        th:first-child {
+          width: 34%;
+        }
+      </style>
+    </head>
+    <body>${previewContent}</body>
+  </html>
+`;
+
 const getStayDaysFromDates = (checkInDate, checkOutDate) => {
   if (!checkInDate || !checkOutDate) {
     return "";
@@ -199,13 +390,109 @@ function ApplicationStayForm({
   };
 
   const handleDownloadPDF = () => {
-    window.print();
+    const previewContent = document.getElementById("booking-preview-content");
+
+    if (!previewContent) {
+      window.print();
+      return;
+    }
+
+    const printFrame = document.createElement("iframe");
+    const removePrintFrame = () => {
+      if (printFrame.parentNode) {
+        printFrame.parentNode.removeChild(printFrame);
+      }
+    };
+
+    printFrame.setAttribute("title", "Booking application print preview");
+    printFrame.style.position = "fixed";
+    printFrame.style.left = "-10000px";
+    printFrame.style.top = "0";
+    printFrame.style.width = "794px";
+    printFrame.style.height = "1123px";
+    printFrame.style.border = "0";
+    printFrame.style.opacity = "0";
+
+    document.body.appendChild(printFrame);
+
+    const printWindow = printFrame.contentWindow;
+    const printDocument = printWindow?.document;
+
+    if (!printWindow || !printDocument) {
+      removePrintFrame();
+      window.print();
+      return;
+    }
+
+    printDocument.open();
+    printDocument.write(getPreviewPrintMarkup(previewContent.outerHTML));
+    printDocument.close();
+
+    printWindow.onafterprint = removePrintFrame;
+
+    setTimeout(() => {
+      printWindow.focus();
+      printWindow.print();
+      setTimeout(removePrintFrame, 1000);
+    }, 500);
   };
 
   const finalSubmit = () => {
     setIsPreviewOpen(false);
     handleSubmit();
   };
+
+  const previewSections = [
+    {
+      title: "Applicant Details",
+      rows: [
+        ["Employee ID", values.employeeId],
+        ["Applicant Name", values.applicantName],
+        ["Designation", values.applicantDesignation],
+        ["Department", values.applicantDepartment],
+        ["Email ID", values.emailId],
+        ["Mobile No", values.applicantMobileNumber],
+      ],
+    },
+    {
+      title: "Guest House Preferences",
+      rows: [
+        ["Selected Guest House", values.guestHouseName],
+        ["All Preferences", values.guestHousePreferences],
+        ["Booking Type", getBookingTypeLabel(values.bookingType)],
+        ["Room Preference", getRoomPreferenceLabel(values.roomType)],
+        ["Number of Rooms", values.roomCount],
+      ],
+    },
+    {
+      title: "Guest Information",
+      rows: [
+        ["Guest Name", values.guestName],
+        ["Guest Designation", values.guestDesignation],
+        ["Guest Mobile Number", values.guestMobileNumber],
+        ["Residential Address", values.guestAddress],
+        ["Purpose of Visit", values.visitPurpose],
+      ],
+    },
+    {
+      title: "Stay Duration",
+      rows: [
+        ["Arrival Date", values.arrivalDate],
+        ["Arrival Time", values.arrivalTime],
+        ["Departure Date", values.departureDate],
+        ["Departure Time", values.departureTime],
+        ["No. of Days/Nights", values.numberOfDays],
+      ],
+    },
+    {
+      title: "Payment",
+      rows: [["Payment Responsibility", values.paymentMode]],
+    },
+  ];
+
+  const previewAccompanyingPersons = values.accompanyingPersons.filter(
+    (person) => person.name?.trim(),
+  );
 
   return (
     <section
@@ -627,7 +914,7 @@ function ApplicationStayForm({
         <Modal.Header className="bg-light d-flex justify-content-between align-items-center py-3">
           <div className="d-flex align-items-center gap-2">
             <Icon name="file alternate outline" color="blue" />
-            <span>Booking Application Summary</span>
+            <span>Guest House Booking Application Form</span>
           </div>
           <Button color="blue" compact circular onClick={handleDownloadPDF}>
             <Icon name="print" /> Print / Save as PDF
@@ -636,18 +923,18 @@ function ApplicationStayForm({
         <Modal.Content scrolling className="p-0">
           <div id="booking-preview-content" className="p-5 bg-white">
             <div className="d-flex justify-content-between align-items-start mb-5 pb-4 border-bottom">
-              <div>
+              {/* <div>
                 <Header
                   as="h1"
                   className="m-0 text-navy"
                   style={{ fontSize: "2.5rem" }}
                 >
-                  University Guest House
+                  University Guest House Booking Application Form
                 </Header>
                 <Header as="h4" className="m-0 text-muted">
-                  Booking Application Form
+                  Review all details before submitting
                 </Header>
-              </div>
+              </div> */}
               <div className="text-end">
                 <span className="d-block small text-muted">Request ID</span>
                 <span className="fw-bold">
@@ -657,86 +944,55 @@ function ApplicationStayForm({
             </div>
 
             <Grid divided="vertically" padded>
-              <Grid.Row columns={2}>
-                <Grid.Column>
-                  <h5 className="section-label">Applicant Information</h5>
-                  <table className="w-100 mt-2">
-                    <tbody>
-                      <tr>
-                        <td className="text-muted pb-2 w-25">Name</td>
-                        <td className="fw-bold pb-2">{values.applicantName}</td>
-                      </tr>
-                      <tr>
-                        <td className="text-muted pb-2">Emp ID</td>
-                        <td className="fw-bold pb-2">{values.employeeId}</td>
-                      </tr>
-                      <tr>
-                        <td className="text-muted pb-2">Department</td>
-                        <td className="fw-bold pb-2">
-                          {values.applicantDepartment}
-                        </td>
-                      </tr>
-                      <tr>
-                        <td className="text-muted">Contact</td>
-                        <td className="fw-bold">
-                          {values.applicantMobileNumber}
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </Grid.Column>
-                <Grid.Column>
-                  <h5 className="section-label">Accommodation Logistics</h5>
-                  <table className="w-100 mt-2">
-                    <tbody>
-                      <tr>
-                        <td className="text-muted pb-2 w-25">Dates</td>
-                        <td className="fw-bold pb-2">
-                          {values.arrivalDate} to {values.departureDate}
-                        </td>
-                      </tr>
-                      <tr>
-                        <td className="text-muted pb-2">Duration</td>
-                        <td className="fw-bold pb-2">
-                          {values.numberOfDays} Nights
-                        </td>
-                      </tr>
-                      <tr>
-                        <td className="text-muted pb-2">Choice</td>
-                        <td className="fw-bold pb-2">
-                          {values.guestHouseName}
-                        </td>
-                      </tr>
-                      <tr>
-                        <td className="text-muted">Room</td>
-                        <td className="fw-bold">{values.roomType} Room</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </Grid.Column>
-              </Grid.Row>
+              {previewSections.map((section) => (
+                <Grid.Row columns={1} key={section.title}>
+                  <Grid.Column>
+                    <h5 className="section-label">{section.title}</h5>
+                    <table className="w-100 mt-2">
+                      <tbody>
+                        {section.rows.map(([label, value]) => (
+                          <tr key={`${section.title}-${label}`}>
+                            <td className="text-muted pb-2 w-25">{label}</td>
+                            <td className="fw-bold pb-2">
+                              {getPreviewValue(value)}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </Grid.Column>
+                </Grid.Row>
+              ))}
 
-              <Grid.Row>
+              <Grid.Row columns={1}>
                 <Grid.Column>
-                  <h5 className="section-label">Guest Information</h5>
-                  <div className="p-3 bg-light rounded mt-2">
-                    <div className="row">
-                      <div className="col-6">
-                        <span className="small text-muted d-block">
-                          Main Guest
-                        </span>
-                        <span className="fw-bold">
-                          {values.guestName} ({values.guestDesignation})
-                        </span>
-                      </div>
-                      <div className="col-6">
-                        <span className="small text-muted d-block">
-                          Purpose
-                        </span>
-                        <span className="fw-bold">{values.visitPurpose}</span>
-                      </div>
-                    </div>
-                  </div>
+                  <h5 className="section-label">Accompanying Persons</h5>
+                  <table className="w-100 mt-2">
+                    <thead>
+                      <tr>
+                        <th className="text-muted pb-2 w-25 text-start">#</th>
+                        <th className="text-muted pb-2 text-start">Name</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {previewAccompanyingPersons.length ? (
+                        previewAccompanyingPersons.map((person, index) => (
+                          <tr key={`${person.name}-${index}`}>
+                            <td className="fw-bold pb-2">{index + 1}</td>
+                            <td className="fw-bold pb-2">
+                              {getPreviewValue(person.name)}
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td className="fw-bold pb-2" colSpan={2}>
+                            -
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
                 </Grid.Column>
               </Grid.Row>
             </Grid>
