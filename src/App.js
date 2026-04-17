@@ -267,6 +267,7 @@ const buildBookingRequestFromApplication = (formValues, requestId) => ({
   guestAddress: formValues.guestAddress,
   accompanyingPersons: formValues.accompanyingPersons,
   modeOfPayment: formValues.paymentMode,
+  officialAttachment: formValues.officialAttachment || null,
 });
 
 function App() {

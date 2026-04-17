@@ -458,6 +458,10 @@ function AdminPage({ bookingData, focusedRequest, onUpdateRequest }) {
           value: getDisplayBookingType(selectedRequest.bookingType),
         },
         {
+          label: "Official Attachment",
+          value: selectedRequest.officialAttachment?.name || "-",
+        },
+        {
           label: "Mode of Payment",
           value: getDisplayPaymentMode(selectedRequest.modeOfPayment),
         },
