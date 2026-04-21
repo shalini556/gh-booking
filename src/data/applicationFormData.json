@@ -88,9 +88,9 @@
     }
   ],
   "paymentModes": [
-    "By Guest",
-    "By Applicant",
-    "University A/C",
-    "Special Fund/Project A/C"
+    "BHU Transfer",
+    "Cash",
+    "Through cheque(BHU Official)",
+    "Transfer By Personal Bank"
   ]
 }

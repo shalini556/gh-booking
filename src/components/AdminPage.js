@@ -576,7 +576,7 @@ function AdminPage({ bookingData, focusedRequest, onUpdateRequest }) {
                             }
                             onClick={() => handleSort("applicantName")}
                           >
-                            Applicant
+                            Applicant Name
                           </Table.HeaderCell>
                           <Table.HeaderCell
                             sorted={

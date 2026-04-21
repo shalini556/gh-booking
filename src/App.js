@@ -468,7 +468,14 @@ function App() {
     <div className="app-shell">
       <header className="app-top-header">
         <div className="app-top-header__inner">
-          <div className="app-top-header__brand">
+          <button
+            className="app-top-header__brand"
+            onClick={() => {
+              setBookingFormNotice(null);
+              setIsBookingFormOpen(false);
+            }}
+            type="button"
+          >
             <img
               alt="Central University Guest House Booking Portal"
               className="app-top-header__logo"
@@ -479,7 +486,7 @@ function App() {
                 University Accomodation Portal
               </span>
             </div>
-          </div>
+          </button>
 
           <nav aria-label="Primary" className="app-top-header__nav">
             <a className="app-top-header__nav-link" href="#portal-overview">

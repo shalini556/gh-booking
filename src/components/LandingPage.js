@@ -20,7 +20,7 @@ function LandingPage({ bookingData }) {
   //   const pendingRequests = allRequests.filter(
   //     (request) => request.status === "Pending",
   //   ).length;
-  //   const approvedRequests = allRequests.filter(
+  //   const Requests = allRequests.filter(
   //     (request) => request.status === "Approved",
   //   ).length;
 
@@ -58,11 +58,13 @@ function LandingPage({ bookingData }) {
           <p>Choose a guest house to show its booking requests below.</p>
         </div>
 
-          <div className="card-grid">
+        <div className="card-grid">
           {bookingData.guestHouses.map((guestHouse) => (
             <button
               className={`card guest-house-card guest-house-button ${
-                selectedGuestHouseName === guestHouse.name ? "card-selected" : ""
+                selectedGuestHouseName === guestHouse.name
+                  ? "card-selected"
+                  : ""
               }`}
               key={guestHouse.name}
               onClick={() => setSelectedGuestHouseName(guestHouse.name)}
@@ -82,7 +84,9 @@ function LandingPage({ bookingData }) {
         </div>
       </section>
 
-      {selectedGuestHouse ? <BookingList guestHouse={selectedGuestHouse} /> : null}
+      {selectedGuestHouse ? (
+        <BookingList guestHouse={selectedGuestHouse} />
+      ) : null}
     </main>
   );
 }

@@ -743,6 +743,9 @@ function ApplicationStayForm({
       className="application-form-shell"
       aria-label={formData.header.title}
     >
+      <div className="application-form-page-heading">
+        Guest House Application Form
+      </div>
       <Segment raised className="application-form-card">
         <div className="bento-grid-container h-100">
           {/* Row 1: Room  Meta-Bar */}
@@ -754,7 +757,7 @@ function ApplicationStayForm({
                   <Icon name="address card" className="m-0" />
                 </div>
                 <div className="lh-1">
-                  <span className="section-label m-0 fw-bold">
+                  <span className="section-label section-heading m-0 fw-bold">
                     Applicant Details
                   </span>
 
@@ -764,7 +767,7 @@ function ApplicationStayForm({
                 </div>
               </div>
               <Form className="form-compact-input">
-                <Grid className="m-0">
+                <Grid className="m-0" stackable>
                   <Grid.Row style={{ paddingTop: 0, paddingBottom: "0.3rem" }}>
                     <Grid.Column width={4}>
                       <span className="section-label">Employee ID</span>
@@ -841,7 +844,7 @@ function ApplicationStayForm({
                   <div className="section-icon">
                     <Icon name="building" m-0 />
                   </div>
-                  <span className="section-label m-0 fw-bold">
+                  <span className="section-label section-heading m-0 fw-bold">
                     Guest House Preferences
                   </span>
                 </div>
@@ -910,13 +913,13 @@ function ApplicationStayForm({
                   <Icon name="user" m-0 />
                 </div>
 
-                <span className="section-label m-0 fw-bold">
+                <span className="section-label section-heading m-0 fw-bold">
                   Guest Information
                 </span>
               </div>
 
               <Form className="form-compact-input">
-                <Grid columns="equal" className="m-0">
+                <Grid columns="equal" className="m-0" stackable>
                   <Grid.Row style={{ paddingBottom: "0.3rem" }}>
                     <Grid.Column width={4}>
                       <span className="section-label">Full Name</span>
@@ -1053,7 +1056,7 @@ function ApplicationStayForm({
                     }}
                   >
                     <Grid.Column width={16}>
-                      <div className="d-flex align-items-center gap-2 mb-2">
+                      <div className="accompanying-person-head d-flex align-items-center gap-2 mb-2">
                         <span className="section-label m-0">
                           Accompanying Persons (
                           {values.accompanyingPersons.length})
@@ -1121,7 +1124,7 @@ function ApplicationStayForm({
 
           <div className="bento-stay">
             <div className="bento-panel d-flex align-items-center justify-content-between p-2">
-              <div className="d-flex gap-5 align-items-center">
+              <div className="stay-payment-layout d-flex gap-5 align-items-center">
                 {/* Stay Duration */}
                 <div className="d-flex flex-column gap-2">
                   <div className="d-flex align-items-center gap-2">
@@ -1129,14 +1132,11 @@ function ApplicationStayForm({
                     <div className="section-icon">
                       <Icon name="calendar alternate" className="m-0" />
                     </div>
-                    <span className="section-label m-0 fw-bold">
+                    <span className="section-label section-heading m-0 fw-bold">
                       Stay Duration
                     </span>
                   </div>
-                  <div
-                    className="footer-column-stack ps-2"
-                    style={{ minWidth: "min(430px, 100%)" }}
-                  >
+                  <div className="stay-summary-block footer-column-stack ps-2">
                     <div className="stay-date-row d-flex align-items-center gap-4">
                       <div className="stay-date-field d-flex align-items-center gap-2">
                         <span className="section-label m-0">Arrival</span>
@@ -1201,13 +1201,13 @@ function ApplicationStayForm({
                 </div>
 
                 {/* Payment Responsibility - Vertical Layout */}
-                <div className="d-flex flex-column gap-4 ps-5 border-left ms-4">
+                <div className="payment-responsibility-section d-flex flex-column gap-4 ps-5 border-left ms-4">
                   <div className="d-flex align-items-center gap-2">
                     <span className="section-number">5</span>
                     <div className="section-icon">
                       <Icon name="credit card" className="m-0" />
                     </div>
-                    <span className="section-label m-0 fw-bold">
+                    <span className="section-label section-heading m-0 fw-bold">
                       Payment Responsibility
                     </span>
                   </div>
@@ -1407,6 +1407,16 @@ function ApplicationStayForm({
           padding: 0.55rem;
           overflow: auto;
           background: var(--portal-bg);
+        }
+        .application-form-page-heading {
+          width: min(1200px, 100%);
+          margin: 0 auto 0.9rem;
+          color: #000000;
+          font-family: Georgia, "Times New Roman", serif;
+          font-size: clamp(1.35rem, 1.1rem + 0.9vw, 2rem);
+          font-weight: 700;
+          line-height: 1.15;
+          text-align: center;
         }
         .application-form-card.ui.segment {
           width: min(1480px, 100%);
@@ -1752,6 +1762,17 @@ function ApplicationStayForm({
         .application-form-shell .bento-stay .footer-column-stack {
           gap: 0.22rem;
         }
+        .stay-payment-layout {
+          width: 100%;
+          align-items: flex-start !important;
+        }
+        .stay-summary-block {
+          width: min(100%, 430px);
+          min-width: 0;
+        }
+        .payment-responsibility-section {
+          min-width: 0;
+        }
         .application-form-shell .bento-stay .ui.transparent.input > input {
           width: 112px !important;
           min-height: 1.65rem;
@@ -1872,7 +1893,7 @@ function ApplicationStayForm({
         .application-form-shell .section-label,
         .application-form-shell .guest-house-preference-slot-label,
         .application-form-shell .guest-house-preference-slot-label span {
-          font-weight: 700 !important;
+          font-weight: 500 !important;
           text-transform: none !important;
         }
         .application-form-shell {
@@ -1883,7 +1904,7 @@ function ApplicationStayForm({
           max-width: 1200px;
           padding: 1.05rem 1.2rem !important;
           border: 1px solid #cfd8d4 !important;
-          border-radius: 0 !important;
+          border-radius: 5px !important;
           box-shadow: none !important;
         }
         .application-form-shell .bento-grid-container {
@@ -1906,7 +1927,7 @@ function ApplicationStayForm({
           border: 1px solid #d6d6d6;
           border-radius: 0;
           background: #ffffff;
-          color: #4a210e;
+          color:#f56d6d;
           font-size: 1rem !important;
         }
         .application-form-shell .section-title-wrap,
@@ -1917,11 +1938,14 @@ function ApplicationStayForm({
         .application-form-shell .section-label {
           display: inline-block;
           margin-bottom: 0.5rem !important;
-          color: #4a210e !important;
-          font-family: Georgia, "Times New Roman", serif !important;
+          color: Black;
+         
           font-size: 1rem !important;
-          font-weight: 700 !important;
+          font-weight: 600 !important;
           letter-spacing: 0 !important;
+        }
+        .application-form-shell .section-heading {
+          color: #000000 !important;
         }
         .application-form-shell .section-label::after,
         .application-form-shell .guest-house-preference-slot-label::after {
@@ -1942,7 +1966,7 @@ function ApplicationStayForm({
         .application-form-shell .guest-house-preference-slot-label::after {
           content: " *";
           color: #b42318;
-          font-family: Georgia, "Times New Roman", serif !important;
+          
           font-weight: 700;
         }
         .application-form-shell .bento-applicant .ui.grid > .row {
@@ -1972,7 +1996,7 @@ function ApplicationStayForm({
           min-height: 2.3rem !important;
           padding: 0.48rem 0.7rem !important;
           border: 1px solid #cfcfcf !important;
-          border-radius: 1px !important;
+          border-radius: 5px !important;
           background: #ffffff !important;
           color: #222222 !important;
           box-shadow: none !important;
@@ -1998,7 +2022,7 @@ function ApplicationStayForm({
         .payment-responsibility-option,
         .calendar-picker-shell,
         .guest-house-preference-slot {
-          border-radius: 0 !important;
+          border-radius: 5px !important;
           box-shadow: none !important;
         }
         .application-form-shell .pill-item,
@@ -2074,25 +2098,82 @@ function ApplicationStayForm({
           }
         }
         @media (max-width: 900px) {
+          .application-form-shell {
+            padding: 0.7rem;
+          }
+          .application-form-card.ui.segment {
+            padding: 0.85rem !important;
+          }
           .guest-house-preference-dropdown-grid {
             grid-template-columns: minmax(0, 1fr);
           }
+          .guest-house-preference-slot {
+            grid-template-columns: minmax(0, 1fr);
+            align-items: start;
+          }
+          .guest-house-preference-dropdown.ui.selection.dropdown {
+            justify-self: stretch;
+            width: 100% !important;
+          }
           .accompanying-person-list {
             grid-template-columns: repeat(2, minmax(0, 1fr));
+            max-height: none;
+            padding-right: 0;
           }
           .application-form-shell .form-compact-input .ui.fluid.input {
             width: 100% !important;
           }
-          .application-form-shell .bento-stay .border-left {
+          .stay-payment-layout {
+            flex-direction: column;
+            gap: 1rem !important;
+          }
+          .payment-responsibility-section {
+            width: 100%;
+            padding-left: 0 !important;
+            margin-left: 0 !important;
             border-left: 0 !important;
+          }
+          .payment-responsibility-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            width: 100%;
+          }
+          .payment-responsibility-option {
+            width: 100%;
+            justify-content: center;
+            white-space: normal;
+            text-align: center;
+          }
+          .stay-date-row {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.85rem !important;
+          }
+          .stay-summary-block {
+            width: 100%;
+            max-width: none;
+            padding-left: 0 !important;
+          }
+          .form-action-buttons {
+            flex-wrap: wrap;
+            justify-content: stretch;
+            gap: 0.65rem !important;
+          }
+          .form-action-buttons .ui.button {
+            flex: 1 1 calc(50% - 0.325rem);
+          }
+          .form-required-error {
+            text-align: left;
           }
         }
         @media (max-width: 640px) {
           .application-form-shell {
-            padding: 0.35rem;
+            padding: 0.45rem;
+          }
+          .application-form-page-heading {
+            margin-bottom: 0.7rem;
+            font-size: 1.2rem;
           }
           .application-form-card.ui.segment {
-            padding: 0.4rem !important;
+            padding: 0.75rem !important;
           }
           .guest-house-preference-dropdown-grid {
             grid-template-columns: minmax(0, 1fr);
@@ -2100,9 +2181,65 @@ function ApplicationStayForm({
           .guest-house-preference-slot {
             grid-template-columns: minmax(0, 1fr);
           }
+          .application-form-shell .ui.grid > .row {
+            padding-top: 0.4rem !important;
+            padding-bottom: 0.7rem !important;
+          }
+          .application-form-shell .ui.grid > .row > .column {
+            padding-left: 0.45rem !important;
+            padding-right: 0.45rem !important;
+          }
+          .application-form-shell .section-title-wrap,
+          .application-form-shell .bento-applicant .d-flex.align-items-center.gap-3 {
+            margin-bottom: 0.55rem !important;
+          }
+          .application-form-shell .section-icon {
+            flex: 0 0 1.65rem;
+            width: 1.65rem;
+            height: 1.65rem;
+          }
+          .application-form-shell .section-label {
+            font-size: 0.92rem !important;
+          }
+          .accompanying-person-head {
+            flex-direction: column;
+            align-items: stretch !important;
+          }
           .accompanying-person-list {
             grid-template-columns: minmax(0, 1fr);
             max-height: 10.9rem;
+          }
+          .accompanying-person-chip {
+            padding: 0.35rem 0.55rem !important;
+          }
+          .stay-date-row {
+            grid-template-columns: minmax(0, 1fr);
+            gap: 0.7rem !important;
+          }
+          .date-picker-group {
+            max-width: none;
+          }
+          .payment-responsibility-grid {
+            grid-template-columns: minmax(0, 1fr);
+          }
+          .official-attachment-row {
+            flex-direction: column;
+            align-items: stretch;
+          }
+          .application-form-shell .official-attachment-input.ui.input {
+            width: 100% !important;
+          }
+          .add-person-button.ui.button {
+            width: 100%;
+            justify-content: center;
+          }
+          .form-action-buttons {
+            flex-direction: column;
+            align-items: stretch !important;
+          }
+          .form-action-buttons .ui.button {
+            flex: 1 1 auto;
+            width: 100%;
           }
           .guest-house-preference-dropdown.ui.selection.dropdown {
             justify-self: stretch;
