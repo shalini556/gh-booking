@@ -3,6 +3,7 @@ import {
   Button,
   Checkbox,
   Container,
+  Dropdown,
   Form,
   Header,
   Icon,
@@ -15,9 +16,14 @@ import {
 } from "semantic-ui-react";
 import { getAvailableRooms } from "../utils/roomAllotment";
 
+const ALL_GUEST_HOUSES = "__all_guest_houses__";
+
 function AdminPage({ bookingData, focusedRequest, onUpdateRequest }) {
-  const rowsPerPage = 15;
-  const [selectedGuestHouseName, setSelectedGuestHouseName] = useState("");
+  const rowsPerPage = 10;
+  const [selectedGuestHouseName, setSelectedGuestHouseName] =
+    useState(ALL_GUEST_HOUSES);
+  const [searchInput, setSearchInput] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   const [adminError, setAdminError] = useState("");
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [confirmationNotice, setConfirmationNotice] = useState(null);
@@ -49,6 +55,7 @@ function AdminPage({ bookingData, focusedRequest, onUpdateRequest }) {
   const [selectedTypes, setSelectedTypes] = useState([]);
   const [showTypeFilter, setShowTypeFilter] = useState(false);
   const typeFilterRef = useRef(null);
+  const hasSearchValue = Boolean(searchInput.trim());
 
   const getDisplayCheckIn = (request) =>
     request.status === "Approved"
@@ -99,18 +106,44 @@ function AdminPage({ bookingData, focusedRequest, onUpdateRequest }) {
     [bookingData.guestHouses, selectedGuestHouseName],
   );
 
-  const hasSelectedGuestHouse = Boolean(selectedGuestHouseName);
+  const isAllGuestHousesSelected =
+    selectedGuestHouseName === ALL_GUEST_HOUSES;
+  const hasSelectedGuestHouse =
+    isAllGuestHousesSelected || Boolean(selectedGuestHouseFilter);
 
   const allRequests = useMemo(
     () =>
-      (selectedGuestHouseFilter ? [selectedGuestHouseFilter] : []).flatMap(
-        (guestHouse) =>
-          guestHouse.requests.map((request) => ({
-            ...request,
-            guestHouseName: guestHouse.name,
-          })),
+      (
+        isAllGuestHousesSelected
+          ? bookingData.guestHouses
+          : selectedGuestHouseFilter
+            ? [selectedGuestHouseFilter]
+            : []
+      ).flatMap((guestHouse) =>
+        guestHouse.requests.map((request) => ({
+          ...request,
+          guestHouseName: guestHouse.name,
+        })),
       ),
-    [selectedGuestHouseFilter],
+    [bookingData.guestHouses, isAllGuestHousesSelected, selectedGuestHouseFilter],
+  );
+
+  const totalRoomCount = useMemo(
+    () =>
+      bookingData.guestHouses.reduce(
+        (count, guestHouse) => count + guestHouse.rooms.length,
+        0,
+      ),
+    [bookingData.guestHouses],
+  );
+
+  const totalRequestCount = useMemo(
+    () =>
+      bookingData.guestHouses.reduce(
+        (count, guestHouse) => count + guestHouse.requests.length,
+        0,
+      ),
+    [bookingData.guestHouses],
   );
 
   // Compute available statuses from data
@@ -145,6 +178,37 @@ function AdminPage({ bookingData, focusedRequest, onUpdateRequest }) {
   // Filter by status + type + date ranges
   const filteredRequests = useMemo(() => {
     let result = allRequests;
+    const normalizedSearchQuery = searchQuery.trim().toLowerCase();
+
+    if (normalizedSearchQuery) {
+      result = result.filter((request) => {
+        const searchableText = [
+          request.requestId,
+          request.applicantName,
+          request.guestName,
+          request.guestHouseName,
+          request.employeeId,
+          request.designation,
+          request.department,
+          request.email,
+          request.phone,
+          request.guestMobileNumber,
+          request.purpose,
+          request.status,
+          getDisplayBookingType(request.bookingType),
+          getDisplayRoomType(request.roomType),
+          getAssignedRoomLabel(request),
+          getDisplayPaymentMode(request.modeOfPayment),
+          getDisplayCheckIn(request),
+          getDisplayCheckOut(request),
+        ]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase();
+
+        return searchableText.includes(normalizedSearchQuery);
+      });
+    }
 
     // Status filter
     if (selectedStatuses.length > 0) {
@@ -189,6 +253,7 @@ function AdminPage({ bookingData, focusedRequest, onUpdateRequest }) {
     return result;
   }, [
     allRequests,
+    searchQuery,
     selectedStatuses,
     selectedTypes,
     startDateFrom,
@@ -250,6 +315,16 @@ function AdminPage({ bookingData, focusedRequest, onUpdateRequest }) {
     }
     setSortConfig({ key, direction });
   };
+
+  const applySearch = useCallback(() => {
+    setActivePage(1);
+    setSearchQuery(searchInput.trim());
+  }, [searchInput]);
+
+  useEffect(() => {
+    setActivePage(1);
+    setSearchQuery(searchInput.trim());
+  }, [searchInput]);
 
   // Toggle status checkbox
   const toggleStatusFilter = (status) => {
@@ -349,6 +424,8 @@ function AdminPage({ bookingData, focusedRequest, onUpdateRequest }) {
 
   useEffect(() => {
     setActivePage(1);
+    setSearchInput("");
+    setSearchQuery("");
     setStartDateFrom("");
     setStartDateTo("");
     setEndDateFrom("");
@@ -367,6 +444,8 @@ function AdminPage({ bookingData, focusedRequest, onUpdateRequest }) {
     setSelectedGuestHouseName(focusedRequest.guestHouseName);
     setSelectedRequestId(focusedRequest.requestId || "");
     setActivePage(1);
+    setSearchInput("");
+    setSearchQuery("");
     setStartDateFrom("");
     setStartDateTo("");
     setEndDateFrom("");
@@ -400,14 +479,6 @@ function AdminPage({ bookingData, focusedRequest, onUpdateRequest }) {
     setAdminError("");
   }, [selectedRequest]);
 
-  const toggleRoomSelection = (roomNumber) => {
-    setSelectedRooms((currentRooms) =>
-      currentRooms.includes(roomNumber)
-        ? currentRooms.filter((item) => item !== roomNumber)
-        : [...currentRooms, roomNumber],
-    );
-  };
-
   const availableRooms = useMemo(() => {
     if (!selectedGuestHouse || !selectedRequest) {
       return [];
@@ -431,6 +502,23 @@ function AdminPage({ bookingData, focusedRequest, onUpdateRequest }) {
     selectedGuestHouse,
     selectedRequest,
   ]);
+
+  const availableRoomOptions = useMemo(
+    () =>
+      [...availableRooms]
+        .sort((leftRoom, rightRoom) =>
+          leftRoom.roomNumber.localeCompare(rightRoom.roomNumber, undefined, {
+            numeric: true,
+            sensitivity: "base",
+          }),
+        )
+        .map((room) => ({
+          key: room.roomNumber,
+          text: `${room.roomNumber} (${getDisplayRoomType(room.roomType)})`,
+          value: room.roomNumber,
+        })),
+    [availableRooms],
+  );
 
   const selectedRequestDetails = selectedRequest
     ? [
@@ -503,6 +591,26 @@ function AdminPage({ bookingData, focusedRequest, onUpdateRequest }) {
               </div>
 
               <div className="semantic-room-card-list">
+                <button
+                  className={`semantic-room-card ${
+                    isAllGuestHousesSelected ? "semantic-room-card-active" : ""
+                  }`}
+                  onClick={() => setSelectedGuestHouseName(ALL_GUEST_HOUSES)}
+                  type="button"
+                >
+                  <span
+                    className="semantic-room-card__icon"
+                    aria-hidden="true"
+                  >
+                    <Icon name="list alternate outline" />
+                  </span>
+                  <span className="semantic-room-card__content">
+                    <strong>All Guest House Booking Requests</strong>
+                    <small>
+                      {totalRoomCount} rooms • {totalRequestCount} requests
+                    </small>
+                  </span>
+                </button>
                 {bookingData.guestHouses.map((guestHouse) => (
                   <button
                     className={`semantic-room-card ${
@@ -539,25 +647,62 @@ function AdminPage({ bookingData, focusedRequest, onUpdateRequest }) {
                 <div>
                   <p className="semantic-panel-kicker">Booking Requests</p>
                 </div>
+                {hasSelectedGuestHouse ? (
+                  <div className="semantic-admin-table-toolbar">
+                    <form
+                      className="semantic-admin-search"
+                      onSubmit={(event) => {
+                        event.preventDefault();
+                        applySearch();
+                      }}
+                    >
+                      <div className="semantic-admin-search__field">
+                        <Icon name="search" />
+                        <input
+                          aria-label="Search booking requests"
+                          onChange={(event) =>
+                            setSearchInput(event.target.value)
+                          }
+                          placeholder="Search by booking ID, name, employee ID, room, status..."
+                          type="search"
+                          value={searchInput}
+                        />
+                      </div>
+                      <Button
+                        className={`semantic-admin-search__button ${
+                          hasSearchValue
+                            ? "semantic-admin-search__button-active"
+                            : ""
+                        }`}
+                        color="blue"
+                        type="submit"
+                      >
+                        Search
+                      </Button>
+                    </form>
+                  </div>
+                ) : null}
               </div>
 
               {!hasSelectedGuestHouse ? (
                 <div className="semantic-table-empty-state" role="status">
                   <p>Select any guest house to view the request details.</p>
                 </div>
-              ) : filteredRequests.length ? (
+              ) : (
                 <>
-                  <div className="semantic-table-wrap">
-                    <Table
-                      celled
-                      className="semantic-booking-table"
-                      selectable
-                      compact="very"
-                      striped
-                      sortable
-                    >
-                      <Table.Header>
-                        <Table.Row>
+                  {filteredRequests.length ? (
+                    <>
+                      <div className="semantic-table-wrap">
+                        <Table
+                          celled
+                          className="semantic-booking-table"
+                          selectable
+                          compact="very"
+                          striped
+                          sortable
+                        >
+                          <Table.Header>
+                            <Table.Row>
                           <Table.HeaderCell
                             sorted={
                               sortConfig.key === "requestId"
@@ -886,75 +1031,82 @@ function AdminPage({ bookingData, focusedRequest, onUpdateRequest }) {
                               )}
                             </div>
                           </Table.HeaderCell>
-                        </Table.Row>
-                      </Table.Header>
-                      <Table.Body>
-                        {paginatedRequests.map((request) => (
-                          <Table.Row
-                            active={selectedRequestId === request.requestId}
-                            key={request.requestId}
-                            onClick={() => {
-                              setSelectedRequestId(request.requestId);
-                              setIsDetailModalOpen(true);
-                            }}
-                          >
-                            <Table.Cell>{request.requestId}</Table.Cell>
-                            <Table.Cell>{request.applicantName}</Table.Cell>
-                            <Table.Cell>{request.guestHouseName}</Table.Cell>
-                            <Table.Cell>
-                              {getDisplayBookingType(request.bookingType)}
-                            </Table.Cell>
-                            <Table.Cell>{request.numberOfGuests}</Table.Cell>
-                            <Table.Cell>
-                              {getDisplayCheckIn(request)}
-                            </Table.Cell>
-                            <Table.Cell>
-                              {getDisplayCheckOut(request)}
-                            </Table.Cell>
-                            <Table.Cell>
-                              {getDisplayRoomType(request.roomType)}
-                            </Table.Cell>
-                            <Table.Cell>
-                              {getAssignedRoomLabel(request)}
-                            </Table.Cell>
-                            <Table.Cell>
-                              {getDisplayPaymentMode(request.modeOfPayment)}
-                            </Table.Cell>
-                            <Table.Cell>
-                              <Label
-                                color={getStatusColor(request.status)}
-                                size="small"
+                            </Table.Row>
+                          </Table.Header>
+                          <Table.Body>
+                            {paginatedRequests.map((request) => (
+                              <Table.Row
+                                active={selectedRequestId === request.requestId}
+                                key={request.requestId}
+                                onClick={() => {
+                                  setSelectedRequestId(request.requestId);
+                                  setIsDetailModalOpen(true);
+                                }}
                               >
-                                {request.status}
-                              </Label>
-                            </Table.Cell>
-                          </Table.Row>
-                        ))}
-                      </Table.Body>
-                    </Table>
-                  </div>
-                  {filteredRequests.length > rowsPerPage ? (
-                    <div className="semantic-table-pagination">
-                      <Pagination
-                        activePage={activePage}
-                        boundaryRange={0}
-                        ellipsisItem={null}
-                        firstItem={null}
-                        lastItem={null}
-                        onPageChange={(_, data) =>
-                          setActivePage(Number(data.activePage) || 1)
-                        }
-                        siblingRange={1}
-                        totalPages={totalPages}
-                      />
-                    </div>
-                  ) : null}
+                                <Table.Cell>{request.requestId}</Table.Cell>
+                                <Table.Cell>{request.applicantName}</Table.Cell>
+                                <Table.Cell>{request.guestHouseName}</Table.Cell>
+                                <Table.Cell>
+                                  {getDisplayBookingType(request.bookingType)}
+                                </Table.Cell>
+                                <Table.Cell>{request.numberOfGuests}</Table.Cell>
+                                <Table.Cell>
+                                  {getDisplayCheckIn(request)}
+                                </Table.Cell>
+                                <Table.Cell>
+                                  {getDisplayCheckOut(request)}
+                                </Table.Cell>
+                                <Table.Cell>
+                                  {getDisplayRoomType(request.roomType)}
+                                </Table.Cell>
+                                <Table.Cell>
+                                  {getAssignedRoomLabel(request)}
+                                </Table.Cell>
+                                <Table.Cell>
+                                  {getDisplayPaymentMode(request.modeOfPayment)}
+                                </Table.Cell>
+                                <Table.Cell>
+                                  <Label
+                                    color={getStatusColor(request.status)}
+                                    size="small"
+                                  >
+                                    {request.status}
+                                  </Label>
+                                </Table.Cell>
+                              </Table.Row>
+                            ))}
+                          </Table.Body>
+                        </Table>
+                      </div>
+                      {filteredRequests.length > rowsPerPage ? (
+                        <div className="semantic-table-pagination">
+                          <Pagination
+                            activePage={activePage}
+                            boundaryRange={1}
+                            ellipsisItem={null}
+                            firstItem={null}
+                            lastItem={null}
+                            nextItem={{ content: "Next" }}
+                            onPageChange={(_, data) =>
+                              setActivePage(Number(data.activePage) || 1)
+                            }
+                            prevItem={null}
+                            siblingRange={1}
+                            totalPages={totalPages}
+                          />
+                        </div>
+                      ) : null}
+                    </>
+                  ) : (
+                    <Message info>
+                      <Message.Header>No matching requests</Message.Header>
+                      <p>
+                        Try a different search term, booking ID, type, or
+                        status filter.
+                      </p>
+                    </Message>
+                  )}
                 </>
-              ) : (
-                <Message info>
-                  <Message.Header>No matching requests</Message.Header>
-                  <p>Try a different booking ID, type, or status filter.</p>
-                </Message>
               )}
             </Segment>
           </section>
@@ -1034,24 +1186,29 @@ function AdminPage({ bookingData, focusedRequest, onUpdateRequest }) {
                 <Header as="h4" className="semantic-subhead">
                   Assign Room(s)
                 </Header>
-                <div className="semantic-room-grid">
-                  {availableRooms.map((room) => (
-                    <Button
-                      basic={!selectedRooms.includes(room.roomNumber)}
-                      className="semantic-room-button"
-                      color={
-                        selectedRooms.includes(room.roomNumber)
-                          ? "blue"
-                          : undefined
-                      }
-                      key={room.roomNumber}
-                      onClick={() => toggleRoomSelection(room.roomNumber)}
-                      type="button"
-                    >
-                      <div>{room.roomNumber}</div>
-                      <small>{getDisplayRoomType(room.roomType)}</small>
-                    </Button>
-                  ))}
+                <div className="semantic-room-selector">
+                  <div className="semantic-room-selector__head">
+                    <span>Select the room no</span>
+                    <small>{availableRoomOptions.length} rooms available</small>
+                  </div>
+                  <Dropdown
+                    aria-label="Select room number"
+                    className="semantic-room-dropdown"
+                    clearable
+                    multiple
+                    options={availableRoomOptions}
+                    placeholder="Select room no"
+                    search
+                    selection
+                    value={selectedRooms}
+                    onChange={(_, data) =>
+                      setSelectedRooms(
+                        Array.isArray(data.value)
+                          ? data.value.map((value) => String(value))
+                          : [],
+                      )
+                    }
+                  />
                 </div>
 
                 {!availableRooms.length ? (
@@ -1113,6 +1270,7 @@ function AdminPage({ bookingData, focusedRequest, onUpdateRequest }) {
                 Confirm Booking
               </Button>
               <Button
+                color="red"
                 onClick={() => {
                   onUpdateRequest({
                     guestHouseName: selectedGuestHouse.name,

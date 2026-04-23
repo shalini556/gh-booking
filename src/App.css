@@ -16,6 +16,15 @@
   --portal-shadow-soft: 0 8px 18px rgba(17, 41, 61, 0.05);
 }
 
+body {
+  font-family: "Segoe UI", Arial, sans-serif;
+  color: var(--portal-text);
+}
+
+* {
+  transition: all 0.2s ease;
+}
+
 .shadow-sm {
   box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
 }
@@ -301,6 +310,7 @@
   padding: 12px 18px;
   background: rgba(248, 251, 250, 0.95);
   backdrop-filter: blur(12px);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
 }
 
 .app-top-header__inner {
@@ -348,9 +358,9 @@
 
 .app-top-header__title {
   color: var(--portal-navy);
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(1.05rem, 1rem + 0.65vw, 1.55rem);
-  font-weight: 700;
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-size: clamp(1.2rem, 1.08rem + 0.78vw, 1.8rem);
+  font-weight: 600;
   line-height: 1.15;
   margin-left: 85px;
 }
@@ -370,7 +380,7 @@
   justify-content: center;
   min-height: 40px;
   padding: 0 16px;
-  border-radius: 999px;
+  border-radius: 8px;
   text-decoration: none;
   font-size: 0.94rem;
   font-weight: 600;
@@ -399,7 +409,8 @@
   border: 0;
   border-radius: 8px;
   color: #ffffff;
-  background: linear-gradient(135deg, var(--portal-green) 0%, #3d947d 100%);
+  background: #2e7d6b;
+  padding: 10px 18px;
   box-shadow: 0 10px 18px rgba(45, 125, 104, 0.2);
   cursor: pointer;
 }
@@ -409,7 +420,7 @@
 .semantic-hero-button.primary:hover,
 .semantic-hero-button.primary:focus-visible {
   transform: translateY(-1px);
-  box-shadow: 0 12px 22px rgba(230, 255, 252, 0.24);
+  box-shadow: 0 12px 22px rgba(46, 125, 107, 0.24);
 }
 
 .app-main {
@@ -462,7 +473,7 @@
   max-width: 1360px;
   height: 100%;
   margin: 0 auto;
-  padding: 0;
+  padding: 0 8px;
   background: transparent;
   display: flex;
   flex-direction: column;
@@ -591,11 +602,11 @@
 
 .semantic-panel.ui.segment {
   margin: 0;
-  padding: 20px;
+  padding: 24px;
   border: 1px solid var(--portal-border);
-  border-radius: 18px;
+  border-radius: 14px;
   background: var(--portal-surface);
-  box-shadow: var(--portal-shadow);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
   overflow: hidden;
 }
 
@@ -627,7 +638,8 @@
 }
 
 .semantic-section-head {
-  margin-bottom: 10px;
+  margin-bottom: 8px;
+  align-items: center;
 }
 
 .semantic-section-title.ui.header {
@@ -688,12 +700,13 @@
   width: 100%;
   padding: 12px;
   border: 1px solid var(--portal-border);
-  border-radius: 12px;
+  border-left: 4px solid transparent;
+  border-radius: 10px;
   background: #f8fafc;
   color: var(--portal-text);
   text-align: left;
   cursor: pointer;
-  box-shadow: none;
+  box-shadow: var(--portal-shadow-soft);
   transition:
     transform 180ms ease,
     box-shadow 180ms ease,
@@ -709,9 +722,10 @@
 }
 
 .semantic-room-card-active {
-  border-color: var(--portal-green);
-  background: var(--portal-green-soft);
-  box-shadow: inset 3px 0 0 var(--portal-green);
+  border-color: rgba(46, 125, 107, 0.28);
+  border-left-color: #2e7d6b;
+  background: #eef6f4;
+  box-shadow: 0 10px 22px rgba(46, 125, 107, 0.12);
 }
 
 .semantic-room-card__icon {
@@ -737,8 +751,8 @@
 
 .semantic-room-card strong {
   color: var(--portal-navy);
-  font-size: 0.85rem;
-  font-weight: 700;
+  font-size: 0.9rem;
+  font-weight: 600;
   line-height: 1.25;
   white-space: nowrap;
   overflow: hidden;
@@ -795,6 +809,77 @@
 
 .semantic-filter-toolbar {
   margin-bottom: 14px;
+}
+
+.semantic-admin-table-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 0;
+  flex: 1 1 auto;
+}
+
+.semantic-admin-search {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  width: min(100%, 560px);
+}
+
+.semantic-admin-search__field {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1 1 auto;
+  min-height: 44px;
+  padding: 10px 16px;
+  border: 1px solid var(--portal-border);
+  border-radius: 25px;
+  background: #fbfdfc;
+  box-shadow: var(--portal-shadow-soft);
+}
+
+.semantic-admin-search__field:focus-within {
+  border-color: rgba(45, 125, 104, 0.45);
+}
+
+.semantic-admin-search__field .icon {
+  margin: 0;
+  color: var(--portal-text-soft);
+  flex-shrink: 0;
+}
+
+.semantic-admin-search__field input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--portal-text);
+  font-size: 0.95rem;
+  font-weight: 400;
+}
+
+.semantic-admin-search__field input::placeholder {
+  color: #7b8f9c;
+}
+
+.semantic-admin-search__button.ui.button {
+  min-height: 44px;
+  margin: 0;
+  padding-inline: 18px;
+  flex-shrink: 0;
+  border-radius: 25px;
+  background: #2e7d6b;
+  color: #ffffff;
+  opacity: 0.88;
+  box-shadow: 0 8px 14px rgba(46, 125, 107, 0.14);
+}
+
+.semantic-admin-search__button.ui.button.semantic-admin-search__button-active {
+  opacity: 1;
+  background: linear-gradient(135deg, #2e7d6b 0%, #256756 100%);
+  box-shadow: 0 12px 22px rgba(46, 125, 107, 0.24);
 }
 
 .semantic-filter-chip-row {
@@ -895,14 +980,14 @@
 .semantic-table-wrap .ui.table {
   margin: 0;
   border: 0;
-  border-radius: 10px;
+  border-radius: 14px;
   overflow: visible;
   table-layout: fixed;
   width: 100%;
 }
 
 .semantic-table-wrap .ui.table thead th {
-  padding: 6px 8px;
+  padding: 10px 14px;
   background: #edf4f1;
   color: var(--portal-navy);
   font-size: 0.9rem;
@@ -990,9 +1075,10 @@
 }
 
 .semantic-table-wrap .ui.table tbody td {
-  padding: 5px 8px;
-  color: black;
-  font-size: 1.1rem;
+  padding: 10px 14px;
+  color: var(--portal-text);
+  font-size: 0.96rem;
+  font-weight: 400;
   border-color: #e5ece9;
   white-space: nowrap;
   overflow: hidden;
@@ -1000,11 +1086,15 @@
 }
 
 .semantic-table-wrap .ui.table tbody tr {
-  transition: background-color 150ms ease;
+  background: #ffffff;
+}
+
+.semantic-table-wrap .ui.table tbody tr:nth-child(even) {
+  background: #fafafa;
 }
 
 .semantic-table-wrap .ui.table tbody tr:hover {
-  background: #f4faf7;
+  background: #f1f7f5;
 }
 
 .semantic-table-wrap .ui.table tbody tr.active {
@@ -1096,34 +1186,56 @@
   margin-bottom: 12px;
 }
 
-.semantic-room-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
-  gap: 10px;
+.semantic-room-selector {
   margin-bottom: 12px;
 }
 
-.semantic-room-button.ui.button {
-  min-height: 68px;
-  margin: 0;
-  padding: 10px 12px;
-  border-radius: 16px;
-  box-shadow: var(--portal-shadow-soft);
-  text-align: center;
+.semantic-room-selector__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+  color: var(--portal-navy);
+  font-size: 0.9rem;
+  font-weight: 600;
 }
 
-.semantic-room-button.ui.button:not(.basic) {
-  background: linear-gradient(135deg, var(--portal-navy) 0%, #225983 100%);
+.semantic-room-selector__head small {
+  color: var(--portal-text-soft);
+  font-size: 0.82rem;
+  font-weight: 500;
 }
 
-.semantic-room-button.ui.button.basic {
+.semantic-room-dropdown.ui.dropdown {
+  width: min(100%, 320px);
+  min-height: 48px;
+  border: 1px solid var(--portal-border);
+  border-radius: 14px;
   background: #ffffff;
+  box-shadow: var(--portal-shadow-soft);
 }
 
-.semantic-room-button.ui.button small {
-  display: block;
-  margin-top: 4px;
-  opacity: 0.78;
+.semantic-room-dropdown.ui.dropdown > .dropdown.icon {
+  color: var(--portal-text-soft);
+}
+
+.semantic-room-dropdown.ui.dropdown .menu {
+  width: 100%;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.semantic-room-dropdown.ui.dropdown > .text,
+.semantic-room-dropdown.ui.dropdown .default.text {
+  color: var(--portal-text-soft);
+}
+
+.semantic-room-dropdown.ui.multiple.dropdown > .label {
+  background: var(--portal-green-soft);
+  border: 1px solid rgba(45, 125, 104, 0.18);
+  color: var(--portal-navy);
+  border-radius: 999px;
 }
 
 .ui.modal > .header {
@@ -1141,7 +1253,11 @@
 }
 
 .ui.button:hover {
-  transform: translateY(-1px);
+  transform: translateY(-1px) scale(1.01);
+}
+
+.ui.button:active {
+  transform: translateY(0) scale(0.995);
 }
 
 .ui.green.button {
@@ -1150,8 +1266,8 @@
 
 .ui.green.label,
 .ui.green.labels .label {
-  background: #246c35 !important;
-  border-color: #246c35 !important;
+  background: #2e7d6b !important;
+  border-color: #2e7d6b !important;
   color: #ffffff !important;
 }
 
@@ -1159,8 +1275,30 @@
   background: linear-gradient(135deg, var(--portal-navy) 0%, #2c678f 100%);
 }
 
+.ui.grey.label,
+.ui.grey.labels .label {
+  background: #eef1f3 !important;
+  border-color: #d8dde2 !important;
+  color: #5f6c76 !important;
+}
+
+.ui.red.button {
+  background: #b13e3e;
+  color: #ffffff;
+}
+
+.ui.red.label,
+.ui.red.labels .label {
+  background: #f2d7d7 !important;
+  border-color: #e7bcbc !important;
+  color: #9b4646 !important;
+}
+
 .ui.label {
-  border-radius: 999px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
 }
 
 @media (max-width: 1100px) {
@@ -1256,7 +1394,7 @@
 
   .semantic-table-wrap .ui.table tbody td,
   .semantic-table-wrap .ui.table thead th {
-    padding: 10px 12px;
+    padding: 9px 12px;
   }
 
   .app-footer__inner p {
@@ -1301,8 +1439,8 @@
 .semantic-detail-card strong {
   display: block;
   margin-bottom: 2px;
-  color: var(--portal-navy);
-  font-size: 0.74rem;
+ color:#7b8085;
+  font-size: 1rem;
   letter-spacing: 0.02em;
   line-height: 1.2;
 }
@@ -1334,17 +1472,15 @@
   line-height: 1.25;
 }
 
-.semantic-compact-modal .semantic-room-grid {
-  grid-template-columns: repeat(auto-fit, minmax(82px, 1fr));
+.semantic-compact-modal .semantic-room-selector__head {
+  align-items: flex-start;
   gap: 6px;
-  margin-bottom: 8px;
 }
 
-.semantic-compact-modal .semantic-room-button.ui.button {
-  min-height: 48px;
-  padding: 6px 8px;
-  border-radius: 12px;
-  font-size: 0.82rem;
+.semantic-compact-modal .semantic-room-dropdown.ui.dropdown {
+  width: min(100%, 280px);
+  min-height: 44px;
+  font-size: 0.88rem;
 }
 
 .semantic-compact-modal .fields {
@@ -1908,12 +2044,29 @@
 }
 
 @media (max-width: 900px) {
+  .semantic-admin-table-toolbar {
+    justify-content: stretch;
+  }
+
+  .semantic-admin-search {
+    width: 100%;
+  }
+
   .semantic-detail-card-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
 @media (max-width: 640px) {
+  .semantic-admin-search {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .semantic-admin-search__button.ui.button {
+    width: 100%;
+  }
+
   .semantic-compact-modal.ui.large.modal {
     width: 96vw;
   }
@@ -1931,7 +2084,7 @@
 /* Col 1: Booking ID */
 .semantic-table-wrap .ui.table.semantic-booking-table thead th:nth-child(1),
 .semantic-table-wrap .ui.table.semantic-booking-table tbody td:nth-child(1) {
-  width: 6%;
+  width: 7%;
 }
 
 /* Col 2: Applicant */
@@ -1943,7 +2096,7 @@
 /* Col 3: Guest House Name */
 .semantic-table-wrap .ui.table.semantic-booking-table thead th:nth-child(3),
 .semantic-table-wrap .ui.table.semantic-booking-table tbody td:nth-child(3) {
-  width: 11%;
+  width: 12%;
 }
 
 /* Col 4: Type */
@@ -1955,7 +2108,7 @@
 /* Col 5: No. of Guests */
 .semantic-table-wrap .ui.table.semantic-booking-table thead th:nth-child(5),
 .semantic-table-wrap .ui.table.semantic-booking-table tbody td:nth-child(5) {
-  width: 7%;
+  width: 9%;
 }
 
 /* Col 6: Start Date */
@@ -2200,7 +2353,7 @@
 .semantic-dashboard-layout {
   display: grid;
   grid-template-columns: 220px 1fr;
-  gap: 8px;
+  gap: 24px;
   align-items: start;
   flex: 1;
   min-height: 0;
@@ -2208,7 +2361,7 @@
 }
 
 #room-allotment .semantic-panel.ui.segment {
-  padding: 12px;
+  padding: 16px;
   position: sticky;
   top: 80px;
 }
@@ -2220,7 +2373,7 @@
 }
 
 #booking-requests .semantic-panel.ui.segment {
-  padding: 10px 14px;
+  padding: 16px 24px;
   overflow: visible;
   flex: 1;
   display: flex;
@@ -2231,7 +2384,7 @@
 .semantic-room-card-list {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
 @media (max-width: 1100px) {

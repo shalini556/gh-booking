@@ -71,6 +71,58 @@ const getSelectedPaymentMode = (formRecord) =>
   formRecord.paymentModes?.find((paymentMode) => paymentMode.checked)?.label ||
   "";
 
+const ROOM_CAPACITY_PER_GUEST_HOUSE = 50;
+
+const getRoomTypeForSequence = (sequence) =>
+  sequence % 2 === 0 ? "double" : "single";
+
+const ensureGuestHouseRoomCapacity = (guestHouse) => {
+  const existingRoomsByNumber = new Map(
+    guestHouse.rooms.map((room) => [room.roomNumber, room]),
+  );
+  const numericRoomNumbers = guestHouse.rooms
+    .map((room) => Number(room.roomNumber))
+    .filter(Number.isFinite);
+
+  if (!numericRoomNumbers.length) {
+    return guestHouse;
+  }
+
+  const smallestRoomNumber = Math.min(...numericRoomNumbers);
+  const roomBlockStart = Math.floor(smallestRoomNumber / 100) * 100;
+  const ensuredRooms = Array.from(
+    { length: ROOM_CAPACITY_PER_GUEST_HOUSE },
+    (_, index) => {
+      const roomNumber = String(roomBlockStart + index + 1);
+      const existingRoom = existingRoomsByNumber.get(roomNumber);
+
+      if (existingRoom) {
+        return existingRoom;
+      }
+
+      return {
+        roomNumber,
+        roomType: getRoomTypeForSequence(index + 1),
+        status: "Empty",
+        occupiedBy: "",
+        bookingId: "",
+        startDate: "",
+        endDate: "",
+      };
+    },
+  );
+
+  return {
+    ...guestHouse,
+    rooms: ensuredRooms,
+  };
+};
+
+const ensureRoomCapacity = (data) => ({
+  ...data,
+  guestHouses: data.guestHouses.map(ensureGuestHouseRoomCapacity),
+});
+
 const getFallbackDate = (formIndex, offsetDays = 0) => {
   const date = new Date(Date.UTC(2026, 4, 1 + formIndex + offsetDays));
   return date.toISOString().slice(0, 10);
@@ -186,7 +238,9 @@ const mergeBookingRequestForms = (data) => ({
   }),
 });
 
-const seedBookingData = mergeBookingRequestForms(guestHouseData);
+const seedBookingData = ensureRoomCapacity(
+  mergeBookingRequestForms(guestHouseData),
+);
 
 const buildPaymentModeLookup = (data) =>
   Object.fromEntries(
@@ -215,7 +269,7 @@ const hydratePaymentModes = (data) => ({
 });
 
 const hydrateBookingData = (data) =>
-  hydratePaymentModes(mergeBookingRequestForms(data));
+  hydratePaymentModes(ensureRoomCapacity(mergeBookingRequestForms(data)));
 
 const getTodayDateString = () => new Date().toISOString().slice(0, 10);
 
@@ -483,7 +537,7 @@ function App() {
             />
             <div className="app-top-header__text">
               <span className="app-top-header__title">
-                University Accomodation Portal
+                University Accommodation Portal
               </span>
             </div>
           </button>

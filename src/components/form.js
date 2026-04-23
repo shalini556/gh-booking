@@ -2035,7 +2035,7 @@ function ApplicationStayForm({
         }
         .application-form-shell .pill-item.active,
         .payment-responsibility-option.active {
-          border-color: #4a210e !important;
+         
           color: #4a210e !important;
           background: #ffffff !important;
         }
