@@ -950,7 +950,7 @@ body {
   padding: 8px;
 }
 
- {
+.semantic-table-wrap {
   overflow: visible;
   border: 1px solid var(--portal-border);
   border-radius: 10px;
@@ -1083,6 +1083,10 @@ body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.semantic-table-wrap .ui.table.semantic-booking-table tbody td:nth-child(1) {
+  font-weight: 500;
 }
 
 .semantic-table-wrap .ui.table tbody tr {
@@ -1439,7 +1443,7 @@ body {
 .semantic-detail-card strong {
   display: block;
   margin-bottom: 2px;
- color:#7b8085;
+  color: #7b8085;
   font-size: 1rem;
   letter-spacing: 0.02em;
   line-height: 1.2;
@@ -1878,10 +1882,9 @@ body {
 
 .stay-duration-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr) minmax(0, 1fr) minmax(
-      0,
-      0.9fr
-    ) 72px;
+  grid-template-columns:
+    minmax(0, 1fr) minmax(0, 0.9fr) minmax(0, 1fr) minmax(0, 0.9fr)
+    72px;
   gap: 8px;
   align-items: end;
 }
@@ -2408,5 +2411,253 @@ body {
 @media (max-width: 640px) {
   .semantic-room-card-list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.admin-page-shell.page-shell.semantic-shell {
+  width: 100%;
+  max-width: none !important;
+  min-height: 100%;
+  padding: 12px 16px 16px;
+}
+
+.admin-dashboard-shell.semantic-dashboard-shell {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+}
+
+.admin-dashboard-layout.semantic-dashboard-layout {
+  grid-template-columns: minmax(250px, 290px) minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.admin-room-allotment,
+.admin-booking-requests {
+  min-width: 0;
+}
+
+.admin-room-panel.semantic-panel.ui.segment,
+.admin-booking-panel.semantic-panel.ui.segment {
+  padding: 16px 18px;
+}
+
+.admin-room-panel.semantic-panel.ui.segment {
+  position: sticky;
+  top: 16px;
+}
+
+.admin-page-shell .semantic-panel-head,
+.admin-page-shell .semantic-section-head {
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.admin-page-shell .semantic-panel-head-compact {
+  margin-bottom: 12px;
+}
+
+.admin-page-shell .semantic-panel-kicker {
+  margin-bottom: 4px;
+  font-size: 0.78rem;
+}
+
+.admin-page-shell .semantic-section-title.ui.header,
+.admin-page-shell .semantic-section-main-title.ui.header {
+  margin: 0;
+  color: #12365f;
+}
+
+.admin-page-shell .semantic-room-card-list {
+  gap: 10px;
+}
+
+.admin-page-shell .semantic-room-card {
+  min-height: 70px;
+  padding: 12px;
+  border-radius: 14px;
+}
+
+.admin-page-shell .semantic-room-card__icon {
+  width: 40px;
+  height: 40px;
+}
+
+.admin-page-shell .semantic-room-card__content strong {
+  margin-bottom: 2px;
+  font-size: 0.93rem;
+}
+
+.admin-page-shell .semantic-room-card__content small {
+  font-size: 0.76rem;
+}
+
+.admin-table-toolbar.semantic-admin-table-toolbar {
+  width: 100%;
+  max-width: 540px;
+  margin-left: auto;
+}
+
+.admin-table-search.semantic-admin-search {
+  width: 100%;
+}
+
+.admin-page-shell .semantic-admin-search__field {
+  min-height: 40px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  box-shadow: none;
+}
+
+.admin-page-shell .semantic-admin-search__field input {
+  font-size: 0.9rem;
+}
+
+.admin-page-shell .semantic-admin-search__button.ui.button {
+  min-height: 40px;
+  padding-inline: 16px;
+  border-radius: 12px;
+  font-size: 0.88rem;
+  box-shadow: none;
+}
+
+.admin-table-wrap.semantic-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid #d9e2ef;
+  border-radius: 16px;
+  background: #ffffff;
+}
+
+.admin-table-wrap .ui.table.admin-booking-table {
+  width: 100%;
+  min-width: 1100px;
+  margin: 0;
+  border: 0;
+  table-layout: fixed;
+}
+
+.admin-table-wrap .ui.table.admin-booking-table thead th {
+  padding: 11px 10px !important;
+  background: #12365f !important;
+  color: #ffffff !important;
+  font-size: 1rem;
+  letter-spacing: 0.03em;
+  border-color: rgba(255, 255, 255, 0.14) !important;
+  white-space: nowrap;
+}
+
+.admin-table-wrap .ui.table.admin-booking-table tbody td {
+  padding: 10px !important;
+  font-size: 1rem;
+  line-height: 1.25;
+  border-color: #e6edf5 !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.admin-table-wrap .ui.table.admin-booking-table .ui.label {
+  padding: 0.5em 0.8em !important;
+  font-size: 0.74rem;
+}
+
+.admin-table-wrap .ui.table.admin-booking-table thead th:nth-child(1),
+.admin-table-wrap .ui.table.admin-booking-table tbody td:nth-child(1) {
+  width: 7%;
+}
+
+.admin-table-wrap .ui.table.admin-booking-table thead th:nth-child(2),
+.admin-table-wrap .ui.table.admin-booking-table tbody td:nth-child(2) {
+  width: 14%;
+}
+
+.admin-table-wrap .ui.table.admin-booking-table thead th:nth-child(3),
+.admin-table-wrap .ui.table.admin-booking-table tbody td:nth-child(3) {
+  width: 12%;
+}
+
+.admin-table-wrap .ui.table.admin-booking-table thead th:nth-child(4),
+.admin-table-wrap .ui.table.admin-booking-table tbody td:nth-child(4) {
+  width: 8%;
+}
+
+.admin-table-wrap .ui.table.admin-booking-table thead th:nth-child(5),
+.admin-table-wrap .ui.table.admin-booking-table tbody td:nth-child(5) {
+  width: 6%;
+}
+
+.admin-table-wrap .ui.table.admin-booking-table thead th:nth-child(6),
+.admin-table-wrap .ui.table.admin-booking-table tbody td:nth-child(6) {
+  width: 10%;
+}
+
+.admin-table-wrap .ui.table.admin-booking-table thead th:nth-child(7),
+.admin-table-wrap .ui.table.admin-booking-table tbody td:nth-child(7) {
+  width: 10%;
+}
+
+.admin-table-wrap .ui.table.admin-booking-table thead th:nth-child(8),
+.admin-table-wrap .ui.table.admin-booking-table tbody td:nth-child(8) {
+  width: 8%;
+}
+
+.admin-table-wrap .ui.table.admin-booking-table thead th:nth-child(9),
+.admin-table-wrap .ui.table.admin-booking-table tbody td:nth-child(9) {
+  width: 8%;
+}
+
+.admin-table-wrap .ui.table.admin-booking-table thead th:nth-child(10),
+.admin-table-wrap .ui.table.admin-booking-table tbody td:nth-child(10) {
+  width: 9%;
+}
+
+.admin-table-wrap .ui.table.admin-booking-table thead th:nth-child(11),
+.admin-table-wrap .ui.table.admin-booking-table tbody td:nth-child(11) {
+  width: 8%;
+}
+
+@media (max-width: 1080px) {
+  .admin-dashboard-layout.semantic-dashboard-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-room-panel.semantic-panel.ui.segment {
+    position: static;
+  }
+
+  .admin-page-shell .semantic-room-card-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .admin-page-shell.page-shell.semantic-shell {
+    padding: 10px;
+  }
+
+  .admin-page-shell .semantic-section-head {
+    align-items: stretch;
+  }
+
+  .admin-table-toolbar.semantic-admin-table-toolbar {
+    max-width: none;
+  }
+
+  .admin-table-search.semantic-admin-search {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin-page-shell .semantic-admin-search__button.ui.button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .admin-page-shell .semantic-room-card-list {
+    grid-template-columns: 1fr;
   }
 }
