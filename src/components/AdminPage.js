@@ -608,9 +608,9 @@ function AdminPage({ bookingData, focusedRequest, onUpdateRequest }) {
             <Segment className="semantic-panel admin-booking-panel">
               <div className="semantic-section-head">
                 <div>
-                  <p className="semantic-panel-kicker">Booking Requests</p>
+                  {/* <p className="semantic-panel-kicker">Booking Requests</p> */}
                   <Header as="h3" className="semantic-section-main-title">
-                    Request List
+                    Booking Request
                   </Header>
                 </div>
 
